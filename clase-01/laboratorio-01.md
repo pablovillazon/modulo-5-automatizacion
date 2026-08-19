@@ -96,7 +96,8 @@ Ejecutar nuevamente y comprobar `TRUE`.
 
 ## 5. Clasificar prioridad
 
-Agregar una transformación y crear:
+Agregar una transformación (Edit Field - Set), vincular con el nodo Edit Field que tiene el Nombre = 'retraso_min'.
+
 
 ```text
 prioridad
@@ -111,6 +112,13 @@ SI retraso_min > 60
 SI retraso_min <= 60
     NORMAL
 ```
+
+Name: prioridad
+Type: String
+Value: 
+```{{ ($json.retraso_min > 60) ? 'ALTA':'NORMAL'}}```
+
+
 
 Ejemplo:
 

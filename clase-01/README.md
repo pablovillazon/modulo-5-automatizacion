@@ -8,6 +8,7 @@ Construir un primer workflow en n8n que reciba datos de una operación de transp
 ### Requisitos
 
 - Docker Desktop
+   https://docs.docker.com/desktop/setup/install/windows-install/
 - Navegador web
 - Editor de texto
 - Conexión a Internet para descargar n8n la primera vez
