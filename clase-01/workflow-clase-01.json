@@ -1,0 +1,140 @@
+{
+  "name": "Clase 1 - Operaciones de Transporte",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "id_operacion",
+              "value": "OP005",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "vehiculo",
+              "value": "TRK005",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "origen",
+              "value": "Cochabamba",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "destino",
+              "value": "Tarija",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "distancia_km",
+              "value": 530,
+              "type": "number"
+            },
+            {
+              "id": "6",
+              "name": "tiempo_estimado_min",
+              "value": 540,
+              "type": "number"
+            },
+            {
+              "id": "7",
+              "name": "tiempo_real_min",
+              "value": 650,
+              "type": "number"
+            },
+            {
+              "id": "8",
+              "name": "consumo_l",
+              "value": 82,
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "id": "datos",
+      "name": "Datos de operación",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9",
+              "name": "retraso_min",
+              "value": "={{ $json.tiempo_real_min - $json.tiempo_estimado_min }}",
+              "type": "number"
+            },
+            {
+              "id": "10",
+              "name": "prioridad",
+              "value": "={{ ($json.tiempo_real_min - $json.tiempo_estimado_min) > 60 ? 'ALTA' : 'NORMAL' }}",
+              "type": "string"
+            },
+            {
+              "id": "11",
+              "name": "alerta_consumo",
+              "value": "={{ $json.consumo_l > 70 ? 'SI' : 'NO' }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "reglas",
+      "name": "Calcular y clasificar",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Datos de operación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Datos de operación": {
+      "main": [
+        [
+          {
+            "node": "Calcular y clasificar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {}
+}
