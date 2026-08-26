@@ -1,0 +1,432 @@
+{
+  "name": "Email Triage Lab",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD",
+            "CATEGORY_PERSONAL"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -496,
+        -32
+      ],
+      "id": "e59fd37a-627a-4f06-a99d-2441e47f273b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPRBmNEcDI6FYxjo",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3-flash-preview",
+          "cachedResultName": "models/gemini-3-flash-preview",
+          "cachedResultUrl": ""
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un asistente de triage de correo. Clasifica el siguiente correo en una\nde estas categorías: \"urgente\", \"consulta_simple\", \"venta_compleja\".\nLuego redacta un borrador breve de respuesta apropiado.\n\nGenera la respuesta SOLO en JSON con este formato:\n{\"categoria\": \"...\", \"borrador\": \"...\"}\n\nEste es el contenido del correo a analizar:\nAsunto: {{ $json.Subject}}\nCuerpo: {{ $json.snippet }}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "ff2006e8-8b6a-4f15-8e84-0b9af952ede6",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FqCH4hDZCHl3Kjmm",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a01ea830-1af5-49c6-9c9f-b1cf7319996b",
+              "name": "content.parts[0].text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        64,
+        -32
+      ],
+      "id": "655c5617-e4bb-4726-8935-71ad29a83389",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content.parts[0].text.categoria }}",
+                    "rightValue": "urgente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "40e40f6d-c19a-4513-a03e-7efd812d661c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "12087697-7b9e-4b44-981c-c6a13028b16c",
+                    "leftValue": "={{ $json.content.parts[0].text.categoria }}",
+                    "rightValue": "consulta_simple",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edc44734-7c19-402c-b0d4-ffc9af033fc9",
+                    "leftValue": "={{ $json.content.parts[0].text.categoria }}",
+                    "rightValue": "venta_compleja",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "cba74d81-38ce-46ab-a42e-da194b5c3c66",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $('Edit Fields').item.json.content.parts[0].text.borrador }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -128
+      ],
+      "id": "caa95dfe-217d-44c1-a65d-51bde866a036",
+      "name": "Reply to a message",
+      "webhookId": "5e809971-b1dd-4229-92e0-83eb9f109bdc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPRBmNEcDI6FYxjo",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "Consulta",
+        "message": "={{ $('Edit Fields').item.json.content.parts[0].text.borrador }}",
+        "options": {
+          "threadId": "={{ $('Gmail Trigger').item.json.threadId }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        64
+      ],
+      "id": "1bce78be-e550-4b7a-9639-e26245622bc6",
+      "name": "Create a draft",
+      "webhookId": "d159ff96-80cf-4d13-abfc-2079127105eb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vPRBmNEcDI6FYxjo",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "e1e8e353-8168-4dfa-8e51-c257073ef558",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1PF2i3KNaNd6HtBtEQHs_81IICoHWXYlOaXQ3448fz8Y",
+          "mode": "list",
+          "cachedResultName": "Campaña Winter 2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PF2i3KNaNd6HtBtEQHs_81IICoHWXYlOaXQ3448fz8Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1642899919,
+          "mode": "list",
+          "cachedResultName": "Labo Triage",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PF2i3KNaNd6HtBtEQHs_81IICoHWXYlOaXQ3448fz8Y/edit#gid=1642899919"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Remitente": "={{ $('Gmail Trigger').item.json.From }}",
+            "Fecha": "={{ $('Gmail Trigger').item.json.internalDate }}",
+            "Severidad": "={{ $('Edit Fields').item.json.content.parts[0].text.categoria }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Remitente",
+              "displayName": "Remitente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Severidad",
+              "displayName": "Severidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Accion",
+              "displayName": "Accion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "2f3e6a2b-f80a-40ce-a39f-ead93cca8bd8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9JxsSqrqSKDnWAby",
+          "name": "Google Sheets account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "cef2750a-6f1d-4aee-9643-30964ca5349b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2a453db195af703d9ec814d10cee7bc877df1e56e124f4f6982ee78f8f769fa7"
+  },
+  "nodeGroups": [],
+  "id": "oTpaX5xyWdbHdfTn",
+  "tags": []
+}
