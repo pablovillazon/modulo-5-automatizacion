@@ -1,0 +1,297 @@
+ticket_id,fecha_hora,cliente,plan,canal,categoria,prioridad,sla_objetivo_min,tiempo_primera_respuesta_min,cumple_sla,accion,resuelto_por,estado,csat
+T-1006,2026-08-02T05:56:00,Silverline Payments,Starter,Email,Solicitud de feature,Baja,2880,620,True,Revision manual,Mixto,Reabierto,
+T-1004,2026-08-02T08:00:00,Kepler Tech,Enterprise,Email,Facturacion,Media,240,210,True,Revision manual,Humano,Resuelto,3
+T-1005,2026-08-02T11:10:00,Lumen Labs,Growth,Email,Solicitud de feature,Baja,1440,1147,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1003,2026-08-02T12:16:00,Cobalt Energy,Starter,Chat,Pregunta de uso,Media,1440,1245,True,Respuesta automatica (IA),IA,En progreso,
+T-1002,2026-08-02T12:48:00,Novo Analytics,Growth,Email,Pregunta de uso,Baja,1440,1885,False,Respuesta automatica (IA),IA,En progreso,
+T-1001,2026-08-02T14:09:00,Pinnacle Health,Enterprise,Formulario,Error o bug,Media,240,85,True,Escalado a ingenieria,Humano,Resuelto,3
+T-1013,2026-08-03T00:24:00,Vantra Payments,Enterprise,Email,Solicitud de feature,Baja,480,384,True,Escalado a ingenieria,Humano,Reabierto,
+T-1012,2026-08-03T05:34:00,Quartz Labs,Starter,Chat,Pregunta de uso,Baja,2880,2748,True,Revision manual,Mixto,Resuelto,4
+T-1020,2026-08-03T05:40:00,Vertex Media,Starter,Formulario,Pregunta de uso,Media,1440,547,True,Respuesta automatica (IA),IA,En progreso,
+T-1015,2026-08-03T06:04:00,Cobalt Retail,Starter,Formulario,Incidente critico,Critica,60,21,True,Alerta a on-call,Mixto,Resuelto,4
+T-1011,2026-08-03T07:12:00,Nimbus Ventures,Starter,Formulario,Incidente critico,Alta,240,432,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1019,2026-08-03T07:35:00,Nimbus Ventures,Starter,Email,Solicitud de feature,Media,1440,2244,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1010,2026-08-03T07:42:00,Ferro Logistics,Starter,Chat,Error o bug,Media,1440,722,True,Escalado a ingenieria,Mixto,Resuelto,1
+T-1007,2026-08-03T09:55:00,Bramble Group,Starter,Chat,Error o bug,Media,1440,1369,True,Revision manual,Mixto,Resuelto,4
+T-1017,2026-08-03T12:36:00,Anchor Labs,Starter,Email,Pregunta de uso,Baja,2880,607,True,Respuesta automatica (IA),IA,Resuelto,2
+T-1008,2026-08-03T13:07:00,Novo Analytics,Growth,Chat,Solicitud de feature,Baja,1440,293,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1021,2026-08-03T13:07:00,Vertex Media,Starter,Chat,Error o bug,Alta,240,583,False,Revision manual,Humano,En progreso,
+T-1014,2026-08-03T13:34:00,Lumen Networks,Enterprise,Pagina de estado,Error o bug,Alta,60,25,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1018,2026-08-03T17:45:00,Quartz Labs,Starter,Email,Solicitud de feature,Baja,2880,2784,True,Revision manual,Humano,Resuelto,4
+T-1009,2026-08-03T18:55:00,Lattice Cloud,Starter,Email,Error o bug,Media,1440,831,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1016,2026-08-03T19:13:00,Riverbed Dynamics,Growth,Chat,Pregunta de uso,Baja,1440,592,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1022,2026-08-03T19:55:00,Tandem Systems,Growth,Chat,Pregunta de uso,Alta,120,200,False,Escalado a ingenieria,Humano,Resuelto,3
+T-1026,2026-08-04T08:16:00,Tandem Dynamics,Enterprise,Pagina de estado,Solicitud de feature,Media,240,484,False,Respuesta automatica (IA),IA,En progreso,
+T-1036,2026-08-04T09:04:00,Kepler Tech,Enterprise,Chat,Facturacion,Media,240,83,True,Revision manual,Mixto,Resuelto,5
+T-1025,2026-08-04T10:04:00,Kinetic Software,Growth,Chat,Error o bug,Media,480,183,True,Escalado a ingenieria,Humano,Reabierto,
+T-1028,2026-08-04T10:20:00,Anchor Cloud,Starter,Chat,Pregunta de uso,Alta,240,61,True,Revision manual,Humano,Resuelto,5
+T-1030,2026-08-04T10:28:00,Delta Group,Starter,Chat,Error o bug,Media,1440,471,True,Escalado a ingenieria,Mixto,En progreso,
+T-1029,2026-08-04T11:47:00,Delta Group,Starter,Chat,Pregunta de uso,Media,1440,952,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1034,2026-08-04T12:51:00,Anchor Labs,Starter,Formulario,Incidente critico,Critica,60,35,True,Alerta a on-call,Humano,En progreso,
+T-1027,2026-08-04T13:16:00,Cobalt Energy,Starter,Chat,Pregunta de uso,Baja,2880,5133,False,Respuesta automatica (IA),IA,En progreso,
+T-1031,2026-08-04T14:05:00,Cobalt Retail,Starter,Chat,Pregunta de uso,Media,1440,1114,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1023,2026-08-04T16:11:00,Tandem Systems,Growth,Email,Solicitud de feature,Media,480,82,True,Revision manual,Humano,Escalado,
+T-1032,2026-08-04T16:29:00,Solace Dynamics,Starter,Chat,Incidente critico,Baja,2880,1937,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1035,2026-08-04T17:35:00,Vertex Ventures,Starter,Chat,Pregunta de uso,Baja,2880,812,True,Revision manual,Humano,En progreso,
+T-1024,2026-08-04T17:54:00,Onyx Energy,Growth,Email,Error o bug,Media,480,152,True,Revision manual,Humano,En progreso,
+T-1033,2026-08-04T17:56:00,Onyx Energy,Growth,Formulario,Error o bug,Media,480,848,False,Respuesta automatica (IA),IA,Reabierto,
+T-1038,2026-08-05T00:22:00,Solace Dynamics,Starter,Chat,Solicitud de feature,Baja,2880,1364,True,Revision manual,Mixto,Resuelto,4
+T-1042,2026-08-05T04:01:00,Meridia Software,Starter,Pagina de estado,Error o bug,Critica,60,19,True,Alerta a on-call,Humano,Resuelto,4
+T-1040,2026-08-05T06:27:00,Solace Dynamics,Starter,Chat,Solicitud de feature,Baja,2880,5240,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1047,2026-08-05T10:15:00,Ferro Logistics,Starter,Chat,Pregunta de uso,Baja,2880,639,True,Revision manual,Humano,Resuelto,4
+T-1039,2026-08-05T11:42:00,Kinetic Software,Growth,Chat,Pregunta de uso,Media,480,233,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1046,2026-08-05T12:09:00,Nimbus Ventures,Starter,Formulario,Pregunta de uso,Media,1440,1093,True,Revision manual,Humano,En progreso,
+T-1048,2026-08-05T12:22:00,Delta Networks,Growth,Email,Pregunta de uso,Baja,1440,623,True,Revision manual,Mixto,Resuelto,5
+T-1050,2026-08-05T12:33:00,Novo Analytics,Growth,Chat,Pregunta de uso,Media,480,469,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1037,2026-08-05T13:26:00,Tandem Systems,Growth,Chat,Facturacion,Alta,120,283,False,Revision manual,Mixto,Escalado,
+T-1045,2026-08-05T13:42:00,Lattice Ventures,Starter,Email,Facturacion,Media,1440,821,True,Revision manual,Mixto,En progreso,
+T-1043,2026-08-05T14:47:00,Vantra Payments,Enterprise,Chat,Pregunta de uso,Media,240,191,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1049,2026-08-05T16:44:00,Anchor Cloud,Starter,Chat,Error o bug,Media,1440,1067,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1044,2026-08-05T19:12:00,Lumen Labs,Growth,Chat,Pregunta de uso,Baja,1440,3098,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1041,2026-08-05T20:26:00,Pinnacle Health,Enterprise,Email,Pregunta de uso,Baja,480,105,True,Respuesta automatica (IA),IA,Resuelto,1
+T-1061,2026-08-06T08:37:00,Orbita Networks,Enterprise,Formulario,Pregunta de uso,Baja,480,396,True,Revision manual,Humano,Resuelto,5
+T-1052,2026-08-06T10:19:00,Delta Group,Starter,Email,Solicitud de feature,Baja,2880,5543,False,Respuesta automatica (IA),IA,Reabierto,
+T-1062,2026-08-06T10:25:00,Nimbus Ventures,Starter,Chat,Solicitud de feature,Baja,2880,1747,True,Escalado a ingenieria,Humano,Resuelto,2
+T-1054,2026-08-06T11:04:00,Vertex Media,Starter,Formulario,Solicitud de feature,Baja,2880,2073,True,Respuesta automatica (IA),IA,En progreso,
+T-1059,2026-08-06T11:17:00,Delta Group,Starter,Email,Pregunta de uso,Baja,2880,1612,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1055,2026-08-06T11:38:00,Lumen Labs,Growth,Chat,Error o bug,Alta,120,40,True,Escalado a ingenieria,Humano,Resuelto,3
+T-1057,2026-08-06T12:02:00,Quartz Labs,Starter,Chat,Error o bug,Alta,240,177,True,Revision manual,Humano,Resuelto,3
+T-1053,2026-08-06T12:55:00,Delta Group,Starter,Formulario,Pregunta de uso,Media,1440,2250,False,Respuesta automatica (IA),IA,Resuelto,1
+T-1051,2026-08-06T15:48:00,Vertex Media,Starter,Email,Error o bug,Media,1440,445,True,Revision manual,Humano,Resuelto,4
+T-1056,2026-08-06T15:48:00,Cobalt Energy,Starter,Chat,Pregunta de uso,Baja,2880,4193,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1060,2026-08-06T15:55:00,Pinnacle Health,Enterprise,Email,Pregunta de uso,Alta,60,56,True,Revision manual,Humano,Resuelto,5
+T-1058,2026-08-06T18:52:00,Anchor Cloud,Starter,Chat,Pregunta de uso,Baja,2880,3561,False,Revision manual,Humano,En progreso,
+T-1067,2026-08-07T00:46:00,Cobalt Ventures,Growth,Email,Pregunta de uso,Baja,1440,918,True,Revision manual,Humano,Resuelto,4
+T-1073,2026-08-07T05:50:00,Nimbus Ventures,Starter,Formulario,Pregunta de uso,Baja,2880,4809,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1064,2026-08-07T07:40:00,Bramble Group,Starter,Chat,Solicitud de feature,Baja,2880,1004,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1063,2026-08-07T08:23:00,Lattice Cloud,Starter,Chat,Pregunta de uso,Baja,2880,1624,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1076,2026-08-07T10:18:00,Delta Networks,Growth,Chat,Solicitud de feature,Media,480,190,True,Revision manual,Humano,Resuelto,4
+T-1069,2026-08-07T11:42:00,Onyx Cloud,Growth,Formulario,Pregunta de uso,Baja,1440,995,True,Respuesta automatica (IA),IA,Reabierto,
+T-1075,2026-08-07T12:22:00,Anchor Labs,Starter,Email,Solicitud de feature,Baja,2880,1147,True,Revision manual,Humano,Resuelto,5
+T-1074,2026-08-07T14:15:00,Orbita Networks,Enterprise,Formulario,Error o bug,Critica,15,10,True,Alerta a on-call,Humano,Resuelto,4
+T-1071,2026-08-07T14:25:00,Tandem Systems,Growth,Email,Error o bug,Media,480,411,True,Revision manual,Mixto,Resuelto,5
+T-1072,2026-08-07T14:58:00,Lumen Networks,Enterprise,Email,Solicitud de feature,Alta,60,20,True,Respuesta automatica (IA),IA,Reabierto,
+T-1070,2026-08-07T17:28:00,Bramble Group,Starter,Formulario,Pregunta de uso,Baja,2880,7114,False,Respuesta automatica (IA),IA,Resuelto,1
+T-1066,2026-08-07T18:32:00,Ferro Logistics,Starter,Chat,Error o bug,Media,1440,379,True,Respuesta automatica (IA),IA,En progreso,
+T-1065,2026-08-07T19:41:00,Riverbed Dynamics,Growth,Email,Error o bug,Media,480,271,True,Revision manual,Humano,Resuelto,3
+T-1068,2026-08-07T19:55:00,Meridia Software,Starter,Chat,Pregunta de uso,Baja,2880,6225,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1077,2026-08-08T09:51:00,Lumen Networks,Enterprise,Formulario,Solicitud de feature,Baja,480,326,True,Escalado a ingenieria,Humano,En progreso,
+T-1078,2026-08-08T10:28:00,Bramble Group,Starter,Chat,Pregunta de uso,Baja,2880,4836,False,Respuesta automatica (IA),IA,Escalado,
+T-1082,2026-08-09T07:14:00,Vertex Media,Starter,Formulario,Pregunta de uso,Baja,2880,1913,True,Revision manual,Humano,Resuelto,4
+T-1081,2026-08-09T16:00:00,Novo Analytics,Growth,Chat,Solicitud de feature,Baja,1440,364,True,Respuesta automatica (IA),IA,En progreso,
+T-1080,2026-08-09T16:29:00,Ferro Logistics,Starter,Formulario,Solicitud de feature,Media,1440,384,True,Revision manual,Mixto,En progreso,
+T-1079,2026-08-09T21:33:00,Cobalt Ventures,Growth,Chat,Error o bug,Alta,120,45,True,Respuesta automatica (IA),IA,Escalado,
+T-1083,2026-08-10T04:31:00,Lumen Labs,Growth,Email,Pregunta de uso,Media,480,715,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1088,2026-08-10T10:50:00,Orbita Networks,Enterprise,Email,Error o bug,Baja,480,201,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1090,2026-08-10T12:25:00,Lumen Labs,Growth,Email,Pregunta de uso,Baja,1440,345,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1089,2026-08-10T13:06:00,Lattice Ventures,Starter,Formulario,Facturacion,Media,1440,481,True,Revision manual,Mixto,Escalado,
+T-1094,2026-08-10T13:21:00,Silverline Payments,Starter,Chat,Facturacion,Media,1440,707,True,Respuesta automatica (IA),IA,Escalado,
+T-1085,2026-08-10T13:41:00,Onyx Energy,Growth,Chat,Solicitud de feature,Media,480,231,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1096,2026-08-10T13:51:00,Meridia Software,Starter,Formulario,Solicitud de feature,Baja,2880,1773,True,Revision manual,Humano,Resuelto,4
+T-1095,2026-08-10T14:22:00,Cobalt Energy,Starter,Pagina de estado,Solicitud de feature,Baja,2880,5431,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1091,2026-08-10T14:35:00,Pinnacle Health,Enterprise,Email,Pregunta de uso,Alta,60,28,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1084,2026-08-10T14:53:00,Cobalt Ventures,Growth,Formulario,Pregunta de uso,Baja,1440,704,True,Revision manual,Humano,Resuelto,5
+T-1092,2026-08-10T15:13:00,Lattice Ventures,Starter,Formulario,Solicitud de feature,Baja,2880,2555,True,Respuesta automatica (IA),IA,En progreso,
+T-1093,2026-08-10T15:23:00,Novo Analytics,Growth,Chat,Pregunta de uso,Alta,120,86,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1087,2026-08-10T16:50:00,Vantra Payments,Enterprise,Email,Pregunta de uso,Baja,480,73,True,Revision manual,Humano,Resuelto,5
+T-1097,2026-08-10T18:22:00,Kepler Tech,Enterprise,Formulario,Incidente critico,Critica,15,36,False,Alerta a on-call,Humano,Resuelto,2
+T-1086,2026-08-10T21:03:00,Anchor Labs,Starter,Chat,Error o bug,Alta,240,85,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1102,2026-08-11T02:58:00,Meridia Software,Starter,Email,Error o bug,Baja,2880,4619,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1105,2026-08-11T08:06:00,Meridia Software,Starter,Chat,Pregunta de uso,Baja,2880,4136,False,Respuesta automatica (IA),IA,En progreso,
+T-1099,2026-08-11T09:42:00,Tandem Systems,Growth,Chat,Error o bug,Media,480,314,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1104,2026-08-11T10:21:00,Novo Analytics,Growth,Email,Pregunta de uso,Media,480,102,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1098,2026-08-11T10:23:00,Riverbed Dynamics,Growth,Chat,Facturacion,Media,480,201,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1101,2026-08-11T12:27:00,Bramble Group,Starter,Email,Facturacion,Media,1440,2450,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1100,2026-08-11T12:42:00,Meridia Software,Starter,Chat,Pregunta de uso,Media,1440,480,True,Revision manual,Humano,Resuelto,2
+T-1103,2026-08-11T16:39:00,Delta Group,Starter,Email,Error o bug,Critica,60,43,True,Alerta a on-call,Humano,Resuelto,5
+T-1109,2026-08-12T06:06:00,Anchor Cloud,Starter,Email,Pregunta de uso,Baja,2880,2434,True,Revision manual,Humano,Resuelto,5
+T-1112,2026-08-12T08:45:00,Meridia Software,Starter,Chat,Pregunta de uso,Baja,2880,1172,True,Respuesta automatica (IA),IA,En progreso,
+T-1107,2026-08-12T10:17:00,Pinnacle Health,Enterprise,Chat,Error o bug,Critica,15,7,True,Alerta a on-call,Humano,Resuelto,5
+T-1111,2026-08-12T10:46:00,Tandem Dynamics,Enterprise,Chat,Incidente critico,Critica,15,14,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1110,2026-08-12T11:58:00,Vertex Ventures,Starter,Chat,Solicitud de feature,Baja,2880,1409,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1106,2026-08-12T13:37:00,Orbita Networks,Enterprise,Chat,Solicitud de feature,Baja,480,440,True,Escalado a ingenieria,Humano,Resuelto,3
+T-1108,2026-08-12T14:32:00,Delta Group,Starter,Formulario,Error o bug,Baja,2880,1819,True,Revision manual,Mixto,Resuelto,3
+T-1113,2026-08-12T15:33:00,Bramble Group,Starter,Chat,Pregunta de uso,Baja,2880,6112,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1114,2026-08-12T23:09:00,Vantra Payments,Enterprise,Email,Pregunta de uso,Baja,480,408,True,Respuesta automatica (IA),IA,En progreso,
+T-1123,2026-08-13T01:32:00,Quartz Labs,Starter,Chat,Error o bug,Baja,2880,2150,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1125,2026-08-13T01:50:00,Onyx Cloud,Growth,Email,Pregunta de uso,Baja,1440,2159,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1122,2026-08-13T07:18:00,Tandem Systems,Growth,Chat,Pregunta de uso,Baja,1440,362,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1119,2026-08-13T08:27:00,Riverbed Dynamics,Growth,Formulario,Facturacion,Media,480,1186,False,Respuesta automatica (IA),IA,Escalado,
+T-1127,2026-08-13T09:50:00,Quartz Labs,Starter,Email,Facturacion,Baja,2880,3487,False,Respuesta automatica (IA),IA,Resuelto,1
+T-1124,2026-08-13T10:33:00,Cobalt Ventures,Growth,Chat,Error o bug,Media,480,385,True,Escalado a ingenieria,Humano,Escalado,
+T-1128,2026-08-13T10:49:00,Ferro Logistics,Starter,Email,Error o bug,Media,1440,3025,False,Respuesta automatica (IA),IA,En progreso,
+T-1120,2026-08-13T11:05:00,Solace Dynamics,Starter,Chat,Pregunta de uso,Media,1440,250,True,Revision manual,Mixto,Resuelto,4
+T-1129,2026-08-13T11:11:00,Cobalt Energy,Starter,Formulario,Solicitud de feature,Baja,2880,1621,True,Revision manual,Humano,En progreso,
+T-1130,2026-08-13T13:20:00,Cobalt Energy,Starter,Formulario,Error o bug,Media,1440,2341,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1117,2026-08-13T13:28:00,Ferro Logistics,Starter,Chat,Solicitud de feature,Media,1440,553,True,Respuesta automatica (IA),IA,Resuelto,2
+T-1115,2026-08-13T14:09:00,Onyx Cloud,Growth,Chat,Pregunta de uso,Baja,1440,1210,True,Revision manual,Mixto,Resuelto,5
+T-1116,2026-08-13T14:48:00,Cobalt Ventures,Growth,Pagina de estado,Pregunta de uso,Baja,1440,753,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1126,2026-08-13T14:53:00,Tandem Dynamics,Enterprise,Email,Error o bug,Alta,60,32,True,Escalado a ingenieria,Humano,En progreso,
+T-1118,2026-08-13T14:55:00,Anchor Cloud,Starter,Email,Facturacion,Alta,240,222,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1121,2026-08-13T17:48:00,Bramble Group,Starter,Chat,Incidente critico,Media,1440,752,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1138,2026-08-14T06:20:00,Ferro Logistics,Starter,Formulario,Pregunta de uso,Baja,2880,1508,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1135,2026-08-14T08:45:00,Lumen Networks,Enterprise,Email,Error o bug,Alta,60,13,True,Escalado a ingenieria,Mixto,Resuelto,5
+T-1136,2026-08-14T08:45:00,Quartz Labs,Starter,Email,Pregunta de uso,Media,1440,978,True,Revision manual,Humano,Resuelto,5
+T-1131,2026-08-14T10:27:00,Vertex Ventures,Starter,Formulario,Pregunta de uso,Alta,240,231,True,Revision manual,Humano,Resuelto,5
+T-1133,2026-08-14T11:48:00,Onyx Cloud,Growth,Formulario,Pregunta de uso,Baja,1440,1944,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1140,2026-08-14T13:08:00,Delta Group,Starter,Chat,Solicitud de feature,Media,1440,950,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1137,2026-08-14T13:29:00,Bramble Group,Starter,Chat,Error o bug,Media,1440,875,True,Escalado a ingenieria,Humano,Resuelto,1
+T-1132,2026-08-14T16:02:00,Cobalt Retail,Starter,Chat,Solicitud de feature,Media,1440,2149,False,Escalado a ingenieria,Humano,Escalado,
+T-1139,2026-08-14T17:53:00,Orbita Networks,Enterprise,Chat,Facturacion,Alta,60,17,True,Revision manual,Humano,Resuelto,5
+T-1134,2026-08-14T18:07:00,Lattice Ventures,Starter,Chat,Incidente critico,Critica,60,22,True,Alerta a on-call,Mixto,Resuelto,3
+T-1141,2026-08-15T10:59:00,Tandem Systems,Growth,Formulario,Error o bug,Media,480,401,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1146,2026-08-15T12:05:00,Lumen Networks,Enterprise,Formulario,Solicitud de feature,Baja,480,273,True,Revision manual,Humano,Resuelto,5
+T-1143,2026-08-15T12:30:00,Novo Analytics,Growth,Email,Error o bug,Critica,30,13,True,Alerta a on-call,Mixto,Resuelto,1
+T-1144,2026-08-15T13:20:00,Meridia Software,Starter,Chat,Solicitud de feature,Media,1440,362,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1142,2026-08-15T14:31:00,Vertex Media,Starter,Chat,Pregunta de uso,Baja,2880,1736,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1145,2026-08-15T18:52:00,Delta Networks,Growth,Pagina de estado,Solicitud de feature,Baja,1440,906,True,Respuesta automatica (IA),IA,En progreso,
+T-1147,2026-08-16T08:16:00,Ferro Logistics,Starter,Email,Error o bug,Critica,60,47,True,Alerta a on-call,Humano,Resuelto,5
+T-1148,2026-08-16T10:39:00,Delta Group,Starter,Formulario,Error o bug,Media,1440,358,True,Revision manual,Humano,En progreso,
+T-1151,2026-08-16T11:43:00,Lumen Networks,Enterprise,Formulario,Facturacion,Media,240,119,True,Revision manual,Mixto,Escalado,
+T-1149,2026-08-16T14:25:00,Tandem Dynamics,Enterprise,Email,Pregunta de uso,Media,240,45,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1150,2026-08-16T19:20:00,Anchor Labs,Starter,Email,Error o bug,Baja,2880,7449,False,Revision manual,Humano,Resuelto,2
+T-1154,2026-08-17T08:13:00,Ferro Logistics,Starter,Email,Solicitud de feature,Baja,2880,2818,True,Escalado a ingenieria,Humano,Reabierto,
+T-1159,2026-08-17T09:06:00,Onyx Energy,Growth,Email,Incidente critico,Media,480,358,True,Respuesta automatica (IA),IA,En progreso,
+T-1158,2026-08-17T09:52:00,Meridia Software,Starter,Chat,Solicitud de feature,Baja,2880,2662,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1156,2026-08-17T10:18:00,Kepler Tech,Enterprise,Pagina de estado,Pregunta de uso,Media,240,173,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1152,2026-08-17T13:14:00,Ferro Logistics,Starter,Pagina de estado,Error o bug,Media,1440,913,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1155,2026-08-17T16:46:00,Anchor Labs,Starter,Chat,Solicitud de feature,Baja,2880,2353,True,Respuesta automatica (IA),IA,Resuelto,2
+T-1157,2026-08-17T18:25:00,Kepler Tech,Enterprise,Chat,Error o bug,Media,240,226,True,Revision manual,Humano,Resuelto,4
+T-1153,2026-08-17T19:07:00,Delta Networks,Growth,Email,Error o bug,Media,480,248,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1166,2026-08-18T01:41:00,Kepler Tech,Enterprise,Chat,Solicitud de feature,Baja,480,166,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1162,2026-08-18T10:02:00,Lumen Networks,Enterprise,Formulario,Error o bug,Media,240,474,False,Respuesta automatica (IA),IA,Reabierto,
+T-1164,2026-08-18T10:18:00,Anchor Labs,Starter,Email,Pregunta de uso,Baja,2880,2242,True,Respuesta automatica (IA),IA,En progreso,
+T-1167,2026-08-18T11:14:00,Lumen Labs,Growth,Formulario,Pregunta de uso,Baja,1440,376,True,Respuesta automatica (IA),IA,En progreso,
+T-1160,2026-08-18T12:12:00,Cobalt Retail,Starter,Formulario,Pregunta de uso,Baja,2880,1119,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1165,2026-08-18T15:11:00,Novo Analytics,Growth,Email,Solicitud de feature,Baja,1440,787,True,Revision manual,Humano,Resuelto,5
+T-1163,2026-08-18T18:08:00,Delta Group,Starter,Chat,Pregunta de uso,Baja,2880,1551,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1161,2026-08-18T18:11:00,Kinetic Software,Growth,Formulario,Pregunta de uso,Baja,1440,1217,True,Revision manual,Humano,En progreso,
+T-1171,2026-08-19T02:16:00,Umbra Ventures,Starter,Email,Pregunta de uso,Baja,2880,2215,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1174,2026-08-19T08:14:00,Meridia Software,Starter,Chat,Error o bug,Baja,2880,2240,True,Revision manual,Humano,Resuelto,5
+T-1179,2026-08-19T08:24:00,Delta Networks,Growth,Chat,Facturacion,Media,480,286,True,Revision manual,Humano,En progreso,
+T-1175,2026-08-19T09:59:00,Delta Networks,Growth,Email,Solicitud de feature,Media,480,377,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1176,2026-08-19T12:43:00,Solace Dynamics,Starter,Chat,Error o bug,Critica,60,11,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1178,2026-08-19T14:47:00,Kinetic Software,Growth,Chat,Pregunta de uso,Media,480,321,True,Respuesta automatica (IA),IA,Resuelto,2
+T-1170,2026-08-19T15:31:00,Pinnacle Health,Enterprise,Chat,Solicitud de feature,Baja,480,275,True,Revision manual,Humano,Resuelto,4
+T-1168,2026-08-19T16:52:00,Cobalt Ventures,Growth,Formulario,Facturacion,Baja,1440,512,True,Respuesta automatica (IA),IA,Escalado,
+T-1169,2026-08-19T18:07:00,Riverbed Dynamics,Growth,Chat,Pregunta de uso,Baja,1440,2799,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1173,2026-08-19T18:24:00,Cobalt Ventures,Growth,Chat,Pregunta de uso,Baja,1440,1032,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1177,2026-08-19T18:36:00,Umbra Ventures,Starter,Email,Error o bug,Baja,2880,1861,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1180,2026-08-19T21:35:00,Tandem Systems,Growth,Chat,Facturacion,Baja,1440,680,True,Revision manual,Humano,Resuelto,5
+T-1172,2026-08-19T22:30:00,Quartz Labs,Starter,Formulario,Pregunta de uso,Alta,240,418,False,Revision manual,Mixto,Reabierto,
+T-1192,2026-08-20T05:00:00,Onyx Cloud,Growth,Chat,Error o bug,Alta,120,26,True,Revision manual,Humano,Resuelto,2
+T-1190,2026-08-20T07:09:00,Cobalt Energy,Starter,Email,Facturacion,Baja,2880,1914,True,Revision manual,Humano,En progreso,
+T-1188,2026-08-20T09:45:00,Umbra Ventures,Starter,Formulario,Facturacion,Media,1440,2113,False,Revision manual,Humano,Resuelto,1
+T-1189,2026-08-20T11:01:00,Ferro Logistics,Starter,Chat,Pregunta de uso,Alta,240,91,True,Revision manual,Humano,En progreso,
+T-1183,2026-08-20T11:15:00,Ferro Logistics,Starter,Chat,Solicitud de feature,Baja,2880,2286,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1181,2026-08-20T11:38:00,Riverbed Dynamics,Growth,Email,Pregunta de uso,Baja,1440,1260,True,Respuesta automatica (IA),IA,En progreso,
+T-1185,2026-08-20T14:46:00,Kinetic Software,Growth,Chat,Facturacion,Critica,30,8,True,Alerta a on-call,Humano,En progreso,
+T-1186,2026-08-20T16:31:00,Lumen Networks,Enterprise,Email,Pregunta de uso,Baja,480,328,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1184,2026-08-20T16:46:00,Vertex Media,Starter,Chat,Pregunta de uso,Baja,2880,2439,True,Revision manual,Humano,Resuelto,4
+T-1187,2026-08-20T18:41:00,Cobalt Retail,Starter,Email,Error o bug,Media,1440,842,True,Revision manual,Humano,En progreso,
+T-1193,2026-08-20T18:44:00,Nimbus Ventures,Starter,Email,Solicitud de feature,Baja,2880,1569,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1182,2026-08-20T20:00:00,Vantra Payments,Enterprise,Email,Pregunta de uso,Baja,480,148,True,Respuesta automatica (IA),IA,En progreso,
+T-1191,2026-08-20T22:14:00,Riverbed Dynamics,Growth,Chat,Pregunta de uso,Baja,1440,1206,True,Respuesta automatica (IA),IA,Reabierto,
+T-1197,2026-08-21T08:37:00,Lumen Networks,Enterprise,Chat,Error o bug,Media,240,53,True,Escalado a ingenieria,Mixto,Resuelto,5
+T-1194,2026-08-21T09:09:00,Onyx Cloud,Growth,Email,Error o bug,Baja,1440,1068,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1201,2026-08-21T09:19:00,Lumen Labs,Growth,Email,Error o bug,Alta,120,26,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1198,2026-08-21T11:23:00,Tandem Systems,Growth,Email,Pregunta de uso,Baja,1440,1667,False,Respuesta automatica (IA),IA,Resuelto,4
+T-1206,2026-08-21T11:28:00,Onyx Energy,Growth,Chat,Error o bug,Alta,120,66,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1202,2026-08-21T11:53:00,Anchor Cloud,Starter,Email,Pregunta de uso,Media,1440,1177,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1204,2026-08-21T11:59:00,Onyx Energy,Growth,Formulario,Pregunta de uso,Media,480,308,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1203,2026-08-21T12:11:00,Bramble Group,Starter,Chat,Pregunta de uso,Baja,2880,2748,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1199,2026-08-21T13:06:00,Bramble Group,Starter,Chat,Error o bug,Alta,240,399,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1195,2026-08-21T13:24:00,Onyx Energy,Growth,Chat,Pregunta de uso,Baja,1440,383,True,Revision manual,Mixto,Resuelto,2
+T-1209,2026-08-21T14:32:00,Kinetic Software,Growth,Formulario,Pregunta de uso,Media,480,469,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1196,2026-08-21T14:39:00,Umbra Ventures,Starter,Email,Error o bug,Alta,240,115,True,Revision manual,Humano,Resuelto,1
+T-1208,2026-08-21T15:25:00,Cobalt Retail,Starter,Pagina de estado,Pregunta de uso,Alta,240,102,True,Revision manual,Humano,Resuelto,5
+T-1200,2026-08-21T15:35:00,Delta Networks,Growth,Formulario,Incidente critico,Critica,30,29,True,Alerta a on-call,Humano,Resuelto,5
+T-1205,2026-08-21T17:04:00,Anchor Labs,Starter,Formulario,Solicitud de feature,Media,1440,1167,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1207,2026-08-21T18:34:00,Cobalt Ventures,Growth,Chat,Pregunta de uso,Baja,1440,1309,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1211,2026-08-22T10:06:00,Lumen Labs,Growth,Email,Incidente critico,Alta,120,34,True,Revision manual,Humano,Resuelto,5
+T-1210,2026-08-22T10:50:00,Lattice Ventures,Starter,Email,Solicitud de feature,Baja,2880,5329,False,Escalado a ingenieria,Humano,Resuelto,3
+T-1212,2026-08-23T08:40:00,Cobalt Energy,Starter,Chat,Solicitud de feature,Media,1440,689,True,Revision manual,Mixto,Resuelto,5
+T-1215,2026-08-23T10:15:00,Lumen Labs,Growth,Chat,Solicitud de feature,Baja,1440,435,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1217,2026-08-23T12:12:00,Vertex Ventures,Starter,Pagina de estado,Pregunta de uso,Baja,2880,2736,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1214,2026-08-23T14:37:00,Lumen Networks,Enterprise,Chat,Pregunta de uso,Baja,480,212,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1213,2026-08-23T16:04:00,Lattice Cloud,Starter,Formulario,Facturacion,Media,1440,1172,True,Revision manual,Humano,Resuelto,5
+T-1216,2026-08-23T18:59:00,Delta Networks,Growth,Chat,Pregunta de uso,Baja,1440,879,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1223,2026-08-24T06:17:00,Nimbus Ventures,Starter,Chat,Error o bug,Media,1440,368,True,Revision manual,Humano,Resuelto,3
+T-1222,2026-08-24T08:45:00,Umbra Ventures,Starter,Chat,Pregunta de uso,Baja,2880,1801,True,Revision manual,Humano,Escalado,
+T-1220,2026-08-24T10:02:00,Cobalt Energy,Starter,Formulario,Error o bug,Media,1440,633,True,Revision manual,Humano,Reabierto,
+T-1230,2026-08-24T10:07:00,Kinetic Software,Growth,Email,Pregunta de uso,Baja,1440,721,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1228,2026-08-24T10:55:00,Anchor Cloud,Starter,Formulario,Solicitud de feature,Baja,2880,1087,True,Escalado a ingenieria,Humano,Resuelto,3
+T-1224,2026-08-24T11:28:00,Novo Analytics,Growth,Email,Pregunta de uso,Baja,1440,3315,False,Revision manual,Humano,En progreso,
+T-1231,2026-08-24T11:52:00,Nimbus Ventures,Starter,Email,Error o bug,Alta,240,63,True,Revision manual,Humano,Resuelto,5
+T-1227,2026-08-24T14:53:00,Tandem Dynamics,Enterprise,Email,Solicitud de feature,Baja,480,121,True,Revision manual,Humano,Resuelto,2
+T-1218,2026-08-24T16:18:00,Vertex Ventures,Starter,Email,Pregunta de uso,Alta,240,354,False,Respuesta automatica (IA),IA,En progreso,
+T-1229,2026-08-24T16:27:00,Cobalt Retail,Starter,Chat,Incidente critico,Alta,240,176,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1219,2026-08-24T16:52:00,Lumen Networks,Enterprise,Email,Pregunta de uso,Media,240,144,True,Revision manual,Mixto,Resuelto,5
+T-1226,2026-08-24T17:31:00,Quartz Labs,Starter,Pagina de estado,Facturacion,Media,1440,1206,True,Revision manual,Humano,Resuelto,4
+T-1221,2026-08-24T17:39:00,Onyx Energy,Growth,Chat,Error o bug,Media,480,138,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1225,2026-08-24T17:54:00,Silverline Payments,Starter,Chat,Pregunta de uso,Baja,2880,2179,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1239,2026-08-25T07:27:00,Cobalt Energy,Starter,Email,Facturacion,Baja,2880,5869,False,Revision manual,Humano,Resuelto,4
+T-1233,2026-08-25T09:41:00,Delta Networks,Growth,Formulario,Pregunta de uso,Baja,1440,2811,False,Respuesta automatica (IA),IA,Resuelto,2
+T-1241,2026-08-25T10:27:00,Kepler Tech,Enterprise,Formulario,Facturacion,Alta,60,12,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1237,2026-08-25T11:44:00,Novo Analytics,Growth,Chat,Pregunta de uso,Baja,1440,982,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1238,2026-08-25T13:25:00,Riverbed Dynamics,Growth,Formulario,Pregunta de uso,Media,480,376,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1234,2026-08-25T13:32:00,Solace Dynamics,Starter,Email,Solicitud de feature,Baja,2880,4948,False,Escalado a ingenieria,Mixto,En progreso,
+T-1235,2026-08-25T14:33:00,Onyx Energy,Growth,Chat,Pregunta de uso,Media,480,77,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1232,2026-08-25T18:39:00,Vertex Ventures,Starter,Chat,Pregunta de uso,Media,1440,1244,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1240,2026-08-25T20:33:00,Lattice Cloud,Starter,Email,Facturacion,Baja,2880,2398,True,Revision manual,Humano,En progreso,
+T-1236,2026-08-25T20:49:00,Cobalt Ventures,Growth,Formulario,Pregunta de uso,Baja,1440,2882,False,Respuesta automatica (IA),IA,Resuelto,1
+T-1244,2026-08-26T06:23:00,Onyx Energy,Growth,Email,Pregunta de uso,Baja,1440,3062,False,Respuesta automatica (IA),IA,Resuelto,3
+T-1248,2026-08-26T08:17:00,Onyx Energy,Growth,Pagina de estado,Pregunta de uso,Baja,1440,3580,False,Revision manual,Humano,Resuelto,3
+T-1242,2026-08-26T08:49:00,Silverline Payments,Starter,Email,Incidente critico,Alta,240,476,False,Revision manual,Humano,Resuelto,5
+T-1243,2026-08-26T08:59:00,Lattice Cloud,Starter,Chat,Error o bug,Media,1440,258,True,Revision manual,Mixto,Resuelto,5
+T-1250,2026-08-26T09:04:00,Novo Analytics,Growth,Email,Facturacion,Baja,1440,379,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1245,2026-08-26T10:54:00,Onyx Cloud,Growth,Chat,Solicitud de feature,Media,480,106,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1249,2026-08-26T11:37:00,Riverbed Dynamics,Growth,Chat,Pregunta de uso,Baja,1440,736,True,Revision manual,Humano,Resuelto,5
+T-1254,2026-08-26T14:41:00,Kinetic Software,Growth,Chat,Error o bug,Media,480,960,False,Revision manual,Humano,Reabierto,
+T-1256,2026-08-26T15:11:00,Cobalt Energy,Starter,Email,Solicitud de feature,Baja,2880,2603,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1246,2026-08-26T16:12:00,Onyx Energy,Growth,Chat,Pregunta de uso,Baja,1440,869,True,Revision manual,Humano,Escalado,
+T-1253,2026-08-26T16:15:00,Orbita Networks,Enterprise,Chat,Incidente critico,Critica,15,4,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1252,2026-08-26T17:20:00,Lumen Labs,Growth,Email,Solicitud de feature,Baja,1440,1066,True,Revision manual,Humano,Resuelto,5
+T-1247,2026-08-26T17:21:00,Solace Dynamics,Starter,Formulario,Error o bug,Alta,240,505,False,Revision manual,Mixto,Resuelto,3
+T-1255,2026-08-26T18:53:00,Anchor Cloud,Starter,Email,Solicitud de feature,Baja,2880,725,True,Revision manual,Humano,Escalado,
+T-1251,2026-08-26T20:13:00,Vertex Ventures,Starter,Chat,Pregunta de uso,Baja,2880,1540,True,Revision manual,Humano,En progreso,
+T-1257,2026-08-27T07:24:00,Delta Group,Starter,Chat,Pregunta de uso,Baja,2880,4145,False,Revision manual,Humano,Resuelto,2
+T-1266,2026-08-27T08:00:00,Orbita Networks,Enterprise,Email,Pregunta de uso,Baja,480,450,True,Respuesta automatica (IA),IA,Reabierto,
+T-1265,2026-08-27T08:35:00,Cobalt Energy,Starter,Chat,Facturacion,Baja,2880,2652,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1263,2026-08-27T10:11:00,Lattice Cloud,Starter,Formulario,Pregunta de uso,Baja,2880,2450,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1262,2026-08-27T13:11:00,Anchor Cloud,Starter,Pagina de estado,Solicitud de feature,Baja,2880,648,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1258,2026-08-27T13:31:00,Solace Dynamics,Starter,Chat,Solicitud de feature,Baja,2880,1784,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1267,2026-08-27T14:40:00,Onyx Cloud,Growth,Formulario,Error o bug,Alta,120,111,True,Respuesta automatica (IA),IA,En progreso,
+T-1261,2026-08-27T15:58:00,Orbita Networks,Enterprise,Formulario,Error o bug,Media,240,176,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1260,2026-08-27T16:14:00,Kepler Tech,Enterprise,Chat,Pregunta de uso,Baja,480,463,True,Respuesta automatica (IA),IA,Escalado,
+T-1259,2026-08-27T16:30:00,Kinetic Software,Growth,Email,Incidente critico,Alta,120,94,True,Revision manual,Mixto,Resuelto,4
+T-1264,2026-08-27T20:23:00,Tandem Systems,Growth,Formulario,Facturacion,Baja,1440,1007,True,Revision manual,Humano,Resuelto,2
+T-1269,2026-08-28T05:28:00,Quartz Labs,Starter,Chat,Pregunta de uso,Baja,2880,2749,True,Revision manual,Humano,Resuelto,4
+T-1271,2026-08-28T06:57:00,Quartz Labs,Starter,Email,Pregunta de uso,Baja,2880,1240,True,Revision manual,Mixto,Resuelto,5
+T-1268,2026-08-28T07:45:00,Meridia Software,Starter,Formulario,Solicitud de feature,Media,1440,1088,True,Respuesta automatica (IA),IA,Resuelto,5
+T-1278,2026-08-28T08:13:00,Lattice Ventures,Starter,Formulario,Solicitud de feature,Baja,2880,734,True,Respuesta automatica (IA),IA,Reabierto,
+T-1273,2026-08-28T08:23:00,Nimbus Ventures,Starter,Formulario,Incidente critico,Alta,240,306,False,Revision manual,Humano,Resuelto,5
+T-1276,2026-08-28T09:03:00,Meridia Software,Starter,Formulario,Facturacion,Media,1440,1194,True,Revision manual,Humano,Escalado,
+T-1275,2026-08-28T09:29:00,Silverline Payments,Starter,Chat,Solicitud de feature,Baja,2880,2433,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1272,2026-08-28T10:12:00,Cobalt Retail,Starter,Email,Pregunta de uso,Baja,2880,1757,True,Revision manual,Humano,Resuelto,5
+T-1277,2026-08-28T11:54:00,Ferro Logistics,Starter,Email,Pregunta de uso,Media,1440,816,True,Revision manual,Mixto,Resuelto,4
+T-1270,2026-08-28T16:14:00,Nimbus Ventures,Starter,Chat,Solicitud de feature,Baja,2880,3620,False,Revision manual,Humano,Resuelto,1
+T-1274,2026-08-28T17:19:00,Vantra Payments,Enterprise,Email,Error o bug,Alta,60,32,True,Revision manual,Humano,Resuelto,5
+T-1279,2026-08-29T09:58:00,Anchor Cloud,Starter,Formulario,Solicitud de feature,Baja,2880,2362,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1283,2026-08-29T10:17:00,Kepler Tech,Enterprise,Formulario,Solicitud de feature,Alta,60,52,True,Escalado a ingenieria,Mixto,Resuelto,5
+T-1281,2026-08-29T10:34:00,Nimbus Ventures,Starter,Email,Solicitud de feature,Baja,2880,2531,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1282,2026-08-29T14:44:00,Ferro Logistics,Starter,Email,Incidente critico,Critica,60,29,True,Escalado a ingenieria,Humano,Resuelto,4
+T-1280,2026-08-29T15:37:00,Kepler Tech,Enterprise,Email,Pregunta de uso,Baja,480,239,True,Respuesta automatica (IA),IA,Resuelto,4
+T-1284,2026-08-30T08:13:00,Pinnacle Health,Enterprise,Chat,Error o bug,Alta,60,29,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1288,2026-08-30T13:13:00,Riverbed Dynamics,Growth,Email,Error o bug,Alta,120,82,True,Escalado a ingenieria,Humano,Resuelto,5
+T-1286,2026-08-30T15:17:00,Umbra Ventures,Starter,Formulario,Error o bug,Media,1440,771,True,Respuesta automatica (IA),IA,Escalado,
+T-1285,2026-08-30T16:33:00,Cobalt Retail,Starter,Chat,Incidente critico,Alta,240,42,True,Respuesta automatica (IA),IA,En progreso,
+T-1287,2026-08-30T20:30:00,Solace Dynamics,Starter,Chat,Error o bug,Media,1440,634,True,Respuesta automatica (IA),IA,Escalado,
+T-1289,2026-08-31T01:16:00,Ferro Logistics,Starter,Chat,Solicitud de feature,Baja,2880,2686,True,Revision manual,Mixto,Resuelto,3
+T-1292,2026-08-31T08:33:00,Vertex Media,Starter,Chat,Pregunta de uso,Baja,2880,2583,True,Revision manual,Mixto,Resuelto,4
+T-1293,2026-08-31T09:26:00,Bramble Group,Starter,Pagina de estado,Facturacion,Baja,2880,2193,True,Revision manual,Mixto,En progreso,
+T-1290,2026-08-31T13:39:00,Meridia Software,Starter,Email,Pregunta de uso,Media,1440,338,True,Respuesta automatica (IA),IA,Resuelto,3
+T-1296,2026-08-31T14:29:00,Lumen Labs,Growth,Chat,Pregunta de uso,Baja,1440,778,True,Revision manual,Humano,Escalado,
+T-1291,2026-08-31T15:30:00,Silverline Payments,Starter,Email,Pregunta de uso,Baja,2880,7439,False,Respuesta automatica (IA),IA,Escalado,
+T-1295,2026-08-31T16:48:00,Delta Group,Starter,Email,Error o bug,Alta,240,225,True,Revision manual,Humano,Resuelto,5
+T-1294,2026-08-31T16:58:00,Tandem Dynamics,Enterprise,Chat,Facturacion,Media,240,107,True,Revision manual,Humano,Resuelto,4

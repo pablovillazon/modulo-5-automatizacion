@@ -996,7 +996,7 @@ n8n beginner tutorial
 n8n nodes
 ```
 
-urln8n en YouTubehttps://www.youtube.com/@n8n-io
+url n8n en YouTube https://www.youtube.com/@n8n-io
 
 ### 2. Microsoft Power Automate
 
@@ -1008,7 +1008,7 @@ Desktop flows
 RPA tutorial
 ```
 
-urlMicrosoft Power Automate en YouTubehttps://www.youtube.com/@MicrosoftPowerAutomate
+url Microsoft Power Automate en YouTube https://www.youtube.com/@MicrosoftPowerAutomate
 
 ### 3. UiPath
 
@@ -1020,7 +1020,7 @@ What is RPA?
 RPA automation examples
 ```
 
-urlUiPath en YouTubehttps://www.youtube.com/@UiPath
+url UiPath en YouTube https://www.youtube.com/@UiPath
 
 
 ---
@@ -1031,25 +1031,25 @@ RPA automation examples
 
 IBM. **¿Qué es la automatización de procesos robóticos (RPA)?**
 
-urlLectura IBM sobre RPAhttps://www.ibm.com/es-es/think/topics/rpa
+url Lectura IBM sobre RPA https://www.ibm.com/es-es/think/topics/rpa
 
 ### Nivel 2 — Workflow
 
 IBM. **What Is Workflow Automation?**
 
-urlLectura IBM sobre Workflow Automationhttps://www.ibm.com/think/topics/workflow-automation
+url Lectura IBM sobre Workflow Automation https://www.ibm.com/think/topics/workflow-automation
 
 ### Nivel 3 — RPA aplicado
 
 Microsoft Learn. **Introducción a flujos de escritorio.**
 
-urlMicrosoft Learn — Desktop flowshttps://learn.microsoft.com/es-es/power-automate/desktop-flows/introduction
+url Microsoft Learn — Desktop flows https://learn.microsoft.com/es-es/power-automate/desktop-flows/introduction
 
 ### Nivel 4 — Herramienta
 
 n8n. **Documentación oficial.**
 
-urln8n Documentationhttps://docs.n8n.io/
+ url n8n Documentation https://docs.n8n.io/
 
 ---
 
