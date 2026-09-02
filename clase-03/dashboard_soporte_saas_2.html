@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Soporte SaaS · KPIs</title>
+<script>
+  // Cargador de Chart.js con reintento en varios CDNs por si uno esta bloqueado
+  // (firewall corporativo, bloqueador de anuncios, o sin conexion en ese momento).
+  window.__chartLoadFailed = false;
+  (function loadChartJs() {
+    var sources = [
+      "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js",
+      "https://unpkg.com/chart.js@4.4.4/dist/chart.umd.min.js"
+    ];
+    var i = 0;
+    function tryNext() {
+      if (i >= sources.length) {
+        window.__chartLoadFailed = true;
+        document.dispatchEvent(new Event('chartjs-unavailable'));
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = sources[i++];
+      s.onload = function () { document.dispatchEvent(new Event('chartjs-ready')); };
+      s.onerror = tryNext;
+      document.head.appendChild(s);
+    }
+    tryNext();
+  })();
+</script>
+<style>
+  :root {
+    --bg: #0f1420;
+    --panel: #161d2e;
+    --panel-2: #1c2438;
+    --border: #2a3450;
+    --text: #e7ebf5;
+    --text-dim: #98a2bb;
+    --accent: #4fd1c5;
+    --accent-2: #f0b429;
+    --danger: #ef6461;
+    --good: #6ee7a8;
+    --font-display: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+  }
+  body { padding: 28px 32px 60px; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .meta {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+  }
+  .filters select {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .filters button {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-display);
+  }
+  .filters button:hover { color: var(--text); border-color: var(--accent); }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi .label {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    line-height: 1.35;
+  }
+  .kpi .value {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: -0.01em;
+  }
+  .kpi .sub {
+    font-size: 11.5px;
+    margin-top: 6px;
+    color: var(--text-dim);
+  }
+  .kpi .sub.good { color: var(--good); }
+  .kpi .sub.bad { color: var(--danger); }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .kpi.c-accent::before { background: var(--accent); }
+  .kpi.c-warn::before { background: var(--accent-2); }
+  .kpi.c-danger::before { background: var(--danger); }
+  .kpi.c-good::before { background: var(--good); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px 12px;
+  }
+  .panel h3 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .panel .desc {
+    margin: 0 0 14px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+  }
+  .panel canvas { max-height: 260px; }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  table.data-table th {
+    text-align: left;
+    color: var(--text-dim);
+    font-weight: 500;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    text-transform: none;
+  }
+  table.data-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: var(--font-mono);
+  }
+  table.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .bar-mini {
+    display: inline-block;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+  }
+  .pill.critica { background: rgba(239,100,97,0.18); color: var(--danger); }
+  .pill.alta { background: rgba(240,180,41,0.18); color: var(--accent-2); }
+  .pill.media { background: rgba(79,209,197,0.15); color: var(--accent); }
+  .pill.baja { background: rgba(152,162,187,0.15); color: var(--text-dim); }
+
+  footer {
+    margin-top: 30px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    text-align: center;
+  }
+
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    body { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Panel de Soporte · SaaS</h1>
+    <p>KPIs operativos de atencion al cliente — SLA, tiempos de respuesta, CSAT y carga por canal</p>
+  </div>
+  <div class="meta" id="metaInfo"></div>
+</header>
+
+<div id="offlineWarning" style="display:none; background:rgba(240,180,41,0.12); border:1px solid rgba(240,180,41,0.4); color:var(--accent-2); border-radius:8px; padding:10px 16px; font-size:13px; margin-bottom:20px;">
+  No se pudo cargar la libreria de graficos (sin conexion a internet o bloqueada por la red/firewall). Los KPIs numericos y la tabla de clientes funcionan igual; los graficos no se muestran.
+</div>
+
+<div class="filters">
+  <select id="filterPlan"><option value="">Todos los planes</option></select>
+  <select id="filterCanal"><option value="">Todos los canales</option></select>
+  <select id="filterPrioridad"><option value="">Todas las prioridades</option></select>
+  <select id="filterResuelto"><option value="">Resuelto por: todos</option></select>
+  <button id="resetFilters">Limpiar filtros</button>
+</div>
+
+<div class="kpi-grid" id="kpiGrid"></div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h3>Volumen de tickets por dia</h3>
+    <p class="desc">Total de tickets creados y proporcion que incumplio el SLA</p>
+    <canvas id="chartVolumen"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Cumplimiento de SLA por prioridad</h3>
+    <p class="desc">% de tickets que cumplieron el SLA objetivo, por nivel de prioridad</p>
+    <canvas id="chartSlaPrioridad"></canvas>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="panel">
+    <h3>Tickets por canal</h3>
+    <p class="desc">Distribucion del volumen total</p>
+    <canvas id="chartCanal"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Tickets por categoria</h3>
+    <p class="desc">Tipo de solicitud mas frecuente</p>
+    <canvas id="chartCategoria"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Resolucion: IA vs Humano vs Mixto</h3>
+    <p class="desc">Quien resolvio el ticket</p>
+    <canvas id="chartResuelto"></canvas>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <h3>CSAT promedio por canal y por agente</h3>
+    <p class="desc">Escala 1-5. Solo tickets con encuesta respondida</p>
+    <canvas id="chartCsat"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Tiempo de primera respuesta vs objetivo de SLA</h3>
+    <p class="desc">Promedio de minutos reales vs el objetivo, por prioridad</p>
+    <canvas id="chartTiempos"></canvas>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Clientes con mas tickets e incidencias</h3>
+  <p class="desc">Top 12 clientes por volumen — util para detectar cuentas en riesgo o con friccion recurrente</p>
+  <table class="data-table" id="tablaClientes">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Plan</th>
+        <th>Tickets</th>
+        <th>% Incumplio SLA</th>
+        <th>Reabiertos</th>
+        <th>CSAT prom.</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<footer>Generado a partir de dataset_triage_soporte_saas.csv — 296 tickets — dashboard estatico, sin backend</footer>
+
+<script>
+const RAW_DATA = [{"ticket_id": "T-1006", "fecha_hora": "2026-08-02T05:56:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 620, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1004", "fecha_hora": "2026-08-02T08:00:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Email", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 210, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1005", "fecha_hora": "2026-08-02T11:10:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1147, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1003", "fecha_hora": "2026-08-02T12:16:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1245, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1002", "fecha_hora": "2026-08-02T12:48:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1885, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1001", "fecha_hora": "2026-08-02T14:09:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 85, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1013", "fecha_hora": "2026-08-03T00:24:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 384, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1012", "fecha_hora": "2026-08-03T05:34:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2748, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1020", "fecha_hora": "2026-08-03T05:40:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 547, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1015", "fecha_hora": "2026-08-03T06:04:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 21, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1011", "fecha_hora": "2026-08-03T07:12:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 432, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1019", "fecha_hora": "2026-08-03T07:35:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2244, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1010", "fecha_hora": "2026-08-03T07:42:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 722, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1007", "fecha_hora": "2026-08-03T09:55:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1369, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1017", "fecha_hora": "2026-08-03T12:36:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 607, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1008", "fecha_hora": "2026-08-03T13:07:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 293, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1021", "fecha_hora": "2026-08-03T13:07:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 583, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1014", "fecha_hora": "2026-08-03T13:34:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Pagina de estado", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 25, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1018", "fecha_hora": "2026-08-03T17:45:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2784, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1009", "fecha_hora": "2026-08-03T18:55:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 831, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1016", "fecha_hora": "2026-08-03T19:13:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 592, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1022", "fecha_hora": "2026-08-03T19:55:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 200, "cumple_sla": false, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1026", "fecha_hora": "2026-08-04T08:16:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Pagina de estado", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 484, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1036", "fecha_hora": "2026-08-04T09:04:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 83, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1025", "fecha_hora": "2026-08-04T10:04:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 183, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1028", "fecha_hora": "2026-08-04T10:20:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 61, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1030", "fecha_hora": "2026-08-04T10:28:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 471, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1029", "fecha_hora": "2026-08-04T11:47:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 952, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1034", "fecha_hora": "2026-08-04T12:51:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 35, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1027", "fecha_hora": "2026-08-04T13:16:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5133, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1031", "fecha_hora": "2026-08-04T14:05:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1114, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1023", "fecha_hora": "2026-08-04T16:11:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 82, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1032", "fecha_hora": "2026-08-04T16:29:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1937, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1035", "fecha_hora": "2026-08-04T17:35:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 812, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1024", "fecha_hora": "2026-08-04T17:54:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 152, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1033", "fecha_hora": "2026-08-04T17:56:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 848, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1038", "fecha_hora": "2026-08-05T00:22:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1364, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1042", "fecha_hora": "2026-08-05T04:01:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 19, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1040", "fecha_hora": "2026-08-05T06:27:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5240, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1047", "fecha_hora": "2026-08-05T10:15:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 639, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1039", "fecha_hora": "2026-08-05T11:42:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 233, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1046", "fecha_hora": "2026-08-05T12:09:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1093, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1048", "fecha_hora": "2026-08-05T12:22:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 623, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1050", "fecha_hora": "2026-08-05T12:33:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 469, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1037", "fecha_hora": "2026-08-05T13:26:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 283, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1045", "fecha_hora": "2026-08-05T13:42:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 821, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1043", "fecha_hora": "2026-08-05T14:47:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 191, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1049", "fecha_hora": "2026-08-05T16:44:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1067, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1044", "fecha_hora": "2026-08-05T19:12:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 3098, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1041", "fecha_hora": "2026-08-05T20:26:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 105, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1061", "fecha_hora": "2026-08-06T08:37:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 396, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1052", "fecha_hora": "2026-08-06T10:19:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5543, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1062", "fecha_hora": "2026-08-06T10:25:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1747, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1054", "fecha_hora": "2026-08-06T11:04:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2073, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1059", "fecha_hora": "2026-08-06T11:17:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1612, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1055", "fecha_hora": "2026-08-06T11:38:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 40, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1057", "fecha_hora": "2026-08-06T12:02:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 177, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1053", "fecha_hora": "2026-08-06T12:55:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2250, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1051", "fecha_hora": "2026-08-06T15:48:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 445, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1056", "fecha_hora": "2026-08-06T15:48:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4193, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1060", "fecha_hora": "2026-08-06T15:55:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 56, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1058", "fecha_hora": "2026-08-06T18:52:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 3561, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1067", "fecha_hora": "2026-08-07T00:46:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 918, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1073", "fecha_hora": "2026-08-07T05:50:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4809, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1064", "fecha_hora": "2026-08-07T07:40:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1004, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1063", "fecha_hora": "2026-08-07T08:23:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1624, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1076", "fecha_hora": "2026-08-07T10:18:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 190, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1069", "fecha_hora": "2026-08-07T11:42:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 995, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1075", "fecha_hora": "2026-08-07T12:22:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1147, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1074", "fecha_hora": "2026-08-07T14:15:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 15, "tiempo_primera_respuesta_min": 10, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1071", "fecha_hora": "2026-08-07T14:25:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 411, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1072", "fecha_hora": "2026-08-07T14:58:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 20, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1070", "fecha_hora": "2026-08-07T17:28:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 7114, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1066", "fecha_hora": "2026-08-07T18:32:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 379, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1065", "fecha_hora": "2026-08-07T19:41:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 271, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1068", "fecha_hora": "2026-08-07T19:55:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 6225, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1077", "fecha_hora": "2026-08-08T09:51:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 326, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1078", "fecha_hora": "2026-08-08T10:28:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4836, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1082", "fecha_hora": "2026-08-09T07:14:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1913, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1081", "fecha_hora": "2026-08-09T16:00:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 364, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1080", "fecha_hora": "2026-08-09T16:29:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 384, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1079", "fecha_hora": "2026-08-09T21:33:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 45, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1083", "fecha_hora": "2026-08-10T04:31:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 715, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1088", "fecha_hora": "2026-08-10T10:50:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 201, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1090", "fecha_hora": "2026-08-10T12:25:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 345, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1089", "fecha_hora": "2026-08-10T13:06:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 481, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1094", "fecha_hora": "2026-08-10T13:21:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 707, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1085", "fecha_hora": "2026-08-10T13:41:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 231, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1096", "fecha_hora": "2026-08-10T13:51:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1773, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1095", "fecha_hora": "2026-08-10T14:22:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5431, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1091", "fecha_hora": "2026-08-10T14:35:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 28, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1084", "fecha_hora": "2026-08-10T14:53:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 704, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1092", "fecha_hora": "2026-08-10T15:13:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2555, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1093", "fecha_hora": "2026-08-10T15:23:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 86, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1087", "fecha_hora": "2026-08-10T16:50:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 73, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1097", "fecha_hora": "2026-08-10T18:22:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 15, "tiempo_primera_respuesta_min": 36, "cumple_sla": false, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1086", "fecha_hora": "2026-08-10T21:03:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 85, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1102", "fecha_hora": "2026-08-11T02:58:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4619, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1105", "fecha_hora": "2026-08-11T08:06:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4136, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1099", "fecha_hora": "2026-08-11T09:42:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 314, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1104", "fecha_hora": "2026-08-11T10:21:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 102, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1098", "fecha_hora": "2026-08-11T10:23:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 201, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1101", "fecha_hora": "2026-08-11T12:27:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2450, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1100", "fecha_hora": "2026-08-11T12:42:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 480, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1103", "fecha_hora": "2026-08-11T16:39:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 43, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1109", "fecha_hora": "2026-08-12T06:06:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2434, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1112", "fecha_hora": "2026-08-12T08:45:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1172, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1107", "fecha_hora": "2026-08-12T10:17:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 15, "tiempo_primera_respuesta_min": 7, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1111", "fecha_hora": "2026-08-12T10:46:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 15, "tiempo_primera_respuesta_min": 14, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1110", "fecha_hora": "2026-08-12T11:58:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1409, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1106", "fecha_hora": "2026-08-12T13:37:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 440, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1108", "fecha_hora": "2026-08-12T14:32:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1819, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1113", "fecha_hora": "2026-08-12T15:33:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 6112, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1114", "fecha_hora": "2026-08-12T23:09:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 408, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1123", "fecha_hora": "2026-08-13T01:32:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2150, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1125", "fecha_hora": "2026-08-13T01:50:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2159, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1122", "fecha_hora": "2026-08-13T07:18:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 362, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1119", "fecha_hora": "2026-08-13T08:27:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 1186, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1127", "fecha_hora": "2026-08-13T09:50:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 3487, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1124", "fecha_hora": "2026-08-13T10:33:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 385, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1128", "fecha_hora": "2026-08-13T10:49:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 3025, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1120", "fecha_hora": "2026-08-13T11:05:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 250, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1129", "fecha_hora": "2026-08-13T11:11:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1621, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1130", "fecha_hora": "2026-08-13T13:20:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2341, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1117", "fecha_hora": "2026-08-13T13:28:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 553, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1115", "fecha_hora": "2026-08-13T14:09:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1210, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1116", "fecha_hora": "2026-08-13T14:48:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Pagina de estado", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 753, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1126", "fecha_hora": "2026-08-13T14:53:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 32, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1118", "fecha_hora": "2026-08-13T14:55:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 222, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1121", "fecha_hora": "2026-08-13T17:48:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 752, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1138", "fecha_hora": "2026-08-14T06:20:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1508, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1135", "fecha_hora": "2026-08-14T08:45:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 13, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1136", "fecha_hora": "2026-08-14T08:45:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 978, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1131", "fecha_hora": "2026-08-14T10:27:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 231, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1133", "fecha_hora": "2026-08-14T11:48:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1944, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1140", "fecha_hora": "2026-08-14T13:08:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 950, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1137", "fecha_hora": "2026-08-14T13:29:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 875, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1132", "fecha_hora": "2026-08-14T16:02:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2149, "cumple_sla": false, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1139", "fecha_hora": "2026-08-14T17:53:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 17, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1134", "fecha_hora": "2026-08-14T18:07:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 22, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1141", "fecha_hora": "2026-08-15T10:59:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 401, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1146", "fecha_hora": "2026-08-15T12:05:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 273, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1143", "fecha_hora": "2026-08-15T12:30:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 30, "tiempo_primera_respuesta_min": 13, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1144", "fecha_hora": "2026-08-15T13:20:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 362, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1142", "fecha_hora": "2026-08-15T14:31:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1736, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1145", "fecha_hora": "2026-08-15T18:52:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Pagina de estado", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 906, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1147", "fecha_hora": "2026-08-16T08:16:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 47, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1148", "fecha_hora": "2026-08-16T10:39:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 358, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1151", "fecha_hora": "2026-08-16T11:43:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 119, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1149", "fecha_hora": "2026-08-16T14:25:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 45, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1150", "fecha_hora": "2026-08-16T19:20:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 7449, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1154", "fecha_hora": "2026-08-17T08:13:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2818, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1159", "fecha_hora": "2026-08-17T09:06:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Email", "categoria": "Incidente critico", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 358, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1158", "fecha_hora": "2026-08-17T09:52:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2662, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1156", "fecha_hora": "2026-08-17T10:18:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Pagina de estado", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 173, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1152", "fecha_hora": "2026-08-17T13:14:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 913, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1155", "fecha_hora": "2026-08-17T16:46:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2353, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1157", "fecha_hora": "2026-08-17T18:25:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 226, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1153", "fecha_hora": "2026-08-17T19:07:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 248, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1166", "fecha_hora": "2026-08-18T01:41:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 166, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1162", "fecha_hora": "2026-08-18T10:02:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 474, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1164", "fecha_hora": "2026-08-18T10:18:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2242, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1167", "fecha_hora": "2026-08-18T11:14:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 376, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1160", "fecha_hora": "2026-08-18T12:12:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1119, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1165", "fecha_hora": "2026-08-18T15:11:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 787, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1163", "fecha_hora": "2026-08-18T18:08:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1551, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1161", "fecha_hora": "2026-08-18T18:11:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1217, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1171", "fecha_hora": "2026-08-19T02:16:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2215, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1174", "fecha_hora": "2026-08-19T08:14:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2240, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1179", "fecha_hora": "2026-08-19T08:24:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 286, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1175", "fecha_hora": "2026-08-19T09:59:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 377, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1176", "fecha_hora": "2026-08-19T12:43:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 11, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1178", "fecha_hora": "2026-08-19T14:47:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 321, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1170", "fecha_hora": "2026-08-19T15:31:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 275, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1168", "fecha_hora": "2026-08-19T16:52:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 512, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1169", "fecha_hora": "2026-08-19T18:07:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2799, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1173", "fecha_hora": "2026-08-19T18:24:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1032, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1177", "fecha_hora": "2026-08-19T18:36:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1861, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1180", "fecha_hora": "2026-08-19T21:35:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 680, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1172", "fecha_hora": "2026-08-19T22:30:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 418, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1192", "fecha_hora": "2026-08-20T05:00:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 26, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1190", "fecha_hora": "2026-08-20T07:09:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1914, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1188", "fecha_hora": "2026-08-20T09:45:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2113, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1189", "fecha_hora": "2026-08-20T11:01:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 91, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1183", "fecha_hora": "2026-08-20T11:15:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2286, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1181", "fecha_hora": "2026-08-20T11:38:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1260, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1185", "fecha_hora": "2026-08-20T14:46:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Critica", "sla_objetivo_min": 30, "tiempo_primera_respuesta_min": 8, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1186", "fecha_hora": "2026-08-20T16:31:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 328, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1184", "fecha_hora": "2026-08-20T16:46:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2439, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1187", "fecha_hora": "2026-08-20T18:41:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 842, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1193", "fecha_hora": "2026-08-20T18:44:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1569, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1182", "fecha_hora": "2026-08-20T20:00:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 148, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1191", "fecha_hora": "2026-08-20T22:14:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1206, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1197", "fecha_hora": "2026-08-21T08:37:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 53, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1194", "fecha_hora": "2026-08-21T09:09:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1068, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1201", "fecha_hora": "2026-08-21T09:19:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 26, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1198", "fecha_hora": "2026-08-21T11:23:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1667, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1206", "fecha_hora": "2026-08-21T11:28:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 66, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1202", "fecha_hora": "2026-08-21T11:53:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1177, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1204", "fecha_hora": "2026-08-21T11:59:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 308, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1203", "fecha_hora": "2026-08-21T12:11:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2748, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1199", "fecha_hora": "2026-08-21T13:06:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 399, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1195", "fecha_hora": "2026-08-21T13:24:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 383, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1209", "fecha_hora": "2026-08-21T14:32:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 469, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1196", "fecha_hora": "2026-08-21T14:39:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 115, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1208", "fecha_hora": "2026-08-21T15:25:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 102, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1200", "fecha_hora": "2026-08-21T15:35:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 30, "tiempo_primera_respuesta_min": 29, "cumple_sla": true, "accion": "Alerta a on-call", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1205", "fecha_hora": "2026-08-21T17:04:00", "cliente": "Anchor Labs", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1167, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1207", "fecha_hora": "2026-08-21T18:34:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1309, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1211", "fecha_hora": "2026-08-22T10:06:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 34, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1210", "fecha_hora": "2026-08-22T10:50:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5329, "cumple_sla": false, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1212", "fecha_hora": "2026-08-23T08:40:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 689, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1215", "fecha_hora": "2026-08-23T10:15:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 435, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1217", "fecha_hora": "2026-08-23T12:12:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2736, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1214", "fecha_hora": "2026-08-23T14:37:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 212, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1213", "fecha_hora": "2026-08-23T16:04:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1172, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1216", "fecha_hora": "2026-08-23T18:59:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 879, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1223", "fecha_hora": "2026-08-24T06:17:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 368, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1222", "fecha_hora": "2026-08-24T08:45:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1801, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1220", "fecha_hora": "2026-08-24T10:02:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 633, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1230", "fecha_hora": "2026-08-24T10:07:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 721, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1228", "fecha_hora": "2026-08-24T10:55:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1087, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1224", "fecha_hora": "2026-08-24T11:28:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 3315, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1231", "fecha_hora": "2026-08-24T11:52:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 63, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1227", "fecha_hora": "2026-08-24T14:53:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 121, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1218", "fecha_hora": "2026-08-24T16:18:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 354, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1229", "fecha_hora": "2026-08-24T16:27:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 176, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1219", "fecha_hora": "2026-08-24T16:52:00", "cliente": "Lumen Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 144, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1226", "fecha_hora": "2026-08-24T17:31:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1206, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1221", "fecha_hora": "2026-08-24T17:39:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 138, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1225", "fecha_hora": "2026-08-24T17:54:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2179, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1239", "fecha_hora": "2026-08-25T07:27:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 5869, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1233", "fecha_hora": "2026-08-25T09:41:00", "cliente": "Delta Networks", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2811, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1241", "fecha_hora": "2026-08-25T10:27:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 12, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1237", "fecha_hora": "2026-08-25T11:44:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 982, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1238", "fecha_hora": "2026-08-25T13:25:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 376, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1234", "fecha_hora": "2026-08-25T13:32:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4948, "cumple_sla": false, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1235", "fecha_hora": "2026-08-25T14:33:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 77, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1232", "fecha_hora": "2026-08-25T18:39:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1244, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1240", "fecha_hora": "2026-08-25T20:33:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Email", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2398, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1236", "fecha_hora": "2026-08-25T20:49:00", "cliente": "Cobalt Ventures", "plan": "Growth", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 2882, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1244", "fecha_hora": "2026-08-26T06:23:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 3062, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1248", "fecha_hora": "2026-08-26T08:17:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Pagina de estado", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 3580, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1242", "fecha_hora": "2026-08-26T08:49:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Email", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 476, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1243", "fecha_hora": "2026-08-26T08:59:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 258, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1250", "fecha_hora": "2026-08-26T09:04:00", "cliente": "Novo Analytics", "plan": "Growth", "canal": "Email", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 379, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1245", "fecha_hora": "2026-08-26T10:54:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 106, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1249", "fecha_hora": "2026-08-26T11:37:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 736, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1254", "fecha_hora": "2026-08-26T14:41:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 960, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1256", "fecha_hora": "2026-08-26T15:11:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2603, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1246", "fecha_hora": "2026-08-26T16:12:00", "cliente": "Onyx Energy", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 869, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1253", "fecha_hora": "2026-08-26T16:15:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 15, "tiempo_primera_respuesta_min": 4, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1252", "fecha_hora": "2026-08-26T17:20:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1066, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1247", "fecha_hora": "2026-08-26T17:21:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 505, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1255", "fecha_hora": "2026-08-26T18:53:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 725, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1251", "fecha_hora": "2026-08-26T20:13:00", "cliente": "Vertex Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1540, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1257", "fecha_hora": "2026-08-27T07:24:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 4145, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1266", "fecha_hora": "2026-08-27T08:00:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 450, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1265", "fecha_hora": "2026-08-27T08:35:00", "cliente": "Cobalt Energy", "plan": "Starter", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2652, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1263", "fecha_hora": "2026-08-27T10:11:00", "cliente": "Lattice Cloud", "plan": "Starter", "canal": "Formulario", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2450, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1262", "fecha_hora": "2026-08-27T13:11:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 648, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1258", "fecha_hora": "2026-08-27T13:31:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1784, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1267", "fecha_hora": "2026-08-27T14:40:00", "cliente": "Onyx Cloud", "plan": "Growth", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 111, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1261", "fecha_hora": "2026-08-27T15:58:00", "cliente": "Orbita Networks", "plan": "Enterprise", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 176, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1260", "fecha_hora": "2026-08-27T16:14:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 463, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1259", "fecha_hora": "2026-08-27T16:30:00", "cliente": "Kinetic Software", "plan": "Growth", "canal": "Email", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 94, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1264", "fecha_hora": "2026-08-27T20:23:00", "cliente": "Tandem Systems", "plan": "Growth", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1007, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 2.0}, {"ticket_id": "T-1269", "fecha_hora": "2026-08-28T05:28:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2749, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1271", "fecha_hora": "2026-08-28T06:57:00", "cliente": "Quartz Labs", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1240, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1268", "fecha_hora": "2026-08-28T07:45:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1088, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1278", "fecha_hora": "2026-08-28T08:13:00", "cliente": "Lattice Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 734, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Reabierto", "csat": null}, {"ticket_id": "T-1273", "fecha_hora": "2026-08-28T08:23:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 306, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1276", "fecha_hora": "2026-08-28T09:03:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Formulario", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 1194, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1275", "fecha_hora": "2026-08-28T09:29:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2433, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1272", "fecha_hora": "2026-08-28T10:12:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 1757, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1277", "fecha_hora": "2026-08-28T11:54:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 816, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1270", "fecha_hora": "2026-08-28T16:14:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 3620, "cumple_sla": false, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 1.0}, {"ticket_id": "T-1274", "fecha_hora": "2026-08-28T17:19:00", "cliente": "Vantra Payments", "plan": "Enterprise", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 32, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1279", "fecha_hora": "2026-08-29T09:58:00", "cliente": "Anchor Cloud", "plan": "Starter", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2362, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1283", "fecha_hora": "2026-08-29T10:17:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Formulario", "categoria": "Solicitud de feature", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 52, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1281", "fecha_hora": "2026-08-29T10:34:00", "cliente": "Nimbus Ventures", "plan": "Starter", "canal": "Email", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2531, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1282", "fecha_hora": "2026-08-29T14:44:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Email", "categoria": "Incidente critico", "prioridad": "Critica", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 29, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1280", "fecha_hora": "2026-08-29T15:37:00", "cliente": "Kepler Tech", "plan": "Enterprise", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 480, "tiempo_primera_respuesta_min": 239, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1284", "fecha_hora": "2026-08-30T08:13:00", "cliente": "Pinnacle Health", "plan": "Enterprise", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 60, "tiempo_primera_respuesta_min": 29, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1288", "fecha_hora": "2026-08-30T13:13:00", "cliente": "Riverbed Dynamics", "plan": "Growth", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 120, "tiempo_primera_respuesta_min": 82, "cumple_sla": true, "accion": "Escalado a ingenieria", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1286", "fecha_hora": "2026-08-30T15:17:00", "cliente": "Umbra Ventures", "plan": "Starter", "canal": "Formulario", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 771, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1285", "fecha_hora": "2026-08-30T16:33:00", "cliente": "Cobalt Retail", "plan": "Starter", "canal": "Chat", "categoria": "Incidente critico", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 42, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1287", "fecha_hora": "2026-08-30T20:30:00", "cliente": "Solace Dynamics", "plan": "Starter", "canal": "Chat", "categoria": "Error o bug", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 634, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1289", "fecha_hora": "2026-08-31T01:16:00", "cliente": "Ferro Logistics", "plan": "Starter", "canal": "Chat", "categoria": "Solicitud de feature", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2686, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1292", "fecha_hora": "2026-08-31T08:33:00", "cliente": "Vertex Media", "plan": "Starter", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2583, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "Resuelto", "csat": 4.0}, {"ticket_id": "T-1293", "fecha_hora": "2026-08-31T09:26:00", "cliente": "Bramble Group", "plan": "Starter", "canal": "Pagina de estado", "categoria": "Facturacion", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 2193, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Mixto", "estado": "En progreso", "csat": null}, {"ticket_id": "T-1290", "fecha_hora": "2026-08-31T13:39:00", "cliente": "Meridia Software", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Media", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 338, "cumple_sla": true, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Resuelto", "csat": 3.0}, {"ticket_id": "T-1296", "fecha_hora": "2026-08-31T14:29:00", "cliente": "Lumen Labs", "plan": "Growth", "canal": "Chat", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 1440, "tiempo_primera_respuesta_min": 778, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1291", "fecha_hora": "2026-08-31T15:30:00", "cliente": "Silverline Payments", "plan": "Starter", "canal": "Email", "categoria": "Pregunta de uso", "prioridad": "Baja", "sla_objetivo_min": 2880, "tiempo_primera_respuesta_min": 7439, "cumple_sla": false, "accion": "Respuesta automatica (IA)", "resuelto_por": "IA", "estado": "Escalado", "csat": null}, {"ticket_id": "T-1295", "fecha_hora": "2026-08-31T16:48:00", "cliente": "Delta Group", "plan": "Starter", "canal": "Email", "categoria": "Error o bug", "prioridad": "Alta", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 225, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 5.0}, {"ticket_id": "T-1294", "fecha_hora": "2026-08-31T16:58:00", "cliente": "Tandem Dynamics", "plan": "Enterprise", "canal": "Chat", "categoria": "Facturacion", "prioridad": "Media", "sla_objetivo_min": 240, "tiempo_primera_respuesta_min": 107, "cumple_sla": true, "accion": "Revision manual", "resuelto_por": "Humano", "estado": "Resuelto", "csat": 4.0}];
+
+// ---------- Helpers ----------
+const fmtPct = (n) => (n*100).toFixed(1) + '%';
+const fmtNum = (n) => n.toLocaleString('es-ES', {maximumFractionDigits: 1});
+const avg = (arr) => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+
+const COLORS = {
+  accent: '#4fd1c5',
+  accent2: '#f0b429',
+  danger: '#ef6461',
+  good: '#6ee7a8',
+  dim: '#98a2bb',
+  purple: '#9b8cf2',
+  blue: '#5b9df9',
+};
+const PALETTE = [COLORS.accent, COLORS.accent2, COLORS.purple, COLORS.blue, COLORS.danger, COLORS.good];
+
+Chart.defaults.color = '#98a2bb';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.font.size = 11.5;
+
+let charts = {};
+let currentData = RAW_DATA;
+
+// ---------- Populate filter dropdowns ----------
+function unique(arr, key) { return [...new Set(arr.map(x => x[key]))].sort(); }
+
+function populateFilters() {
+  const planSel = document.getElementById('filterPlan');
+  const canalSel = document.getElementById('filterCanal');
+  const prioSel = document.getElementById('filterPrioridad');
+  const resSel = document.getElementById('filterResuelto');
+
+  unique(RAW_DATA, 'plan').forEach(v => planSel.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  unique(RAW_DATA, 'canal').forEach(v => canalSel.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+  const prioOrder = ['Critica','Alta','Media','Baja'];
+  prioOrder.forEach(v => { if (RAW_DATA.some(x=>x.prioridad===v)) prioSel.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`); });
+  unique(RAW_DATA, 'resuelto_por').forEach(v => resSel.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`));
+
+  [planSel, canalSel, prioSel, resSel].forEach(sel => sel.addEventListener('change', applyFilters));
+  document.getElementById('resetFilters').addEventListener('click', () => {
+    [planSel, canalSel, prioSel, resSel].forEach(s => s.value = '');
+    applyFilters();
+  });
+}
+
+function applyFilters() {
+  const plan = document.getElementById('filterPlan').value;
+  const canal = document.getElementById('filterCanal').value;
+  const prio = document.getElementById('filterPrioridad').value;
+  const res = document.getElementById('filterResuelto').value;
+
+  currentData = RAW_DATA.filter(x =>
+    (!plan || x.plan === plan) &&
+    (!canal || x.canal === canal) &&
+    (!prio || x.prioridad === prio) &&
+    (!res || x.resuelto_por === res)
+  );
+  renderAll();
+}
+
+// ---------- KPI cards ----------
+function renderKPIs() {
+  const d = currentData;
+  const total = d.length;
+  const slaOk = d.filter(x => x.cumple_sla).length;
+  const slaRate = total ? slaOk/total : 0;
+  const csats = d.filter(x => x.csat !== null).map(x => x.csat);
+  const csatAvg = avg(csats);
+  const frtAvg = avg(d.map(x => x.tiempo_primera_respuesta_min));
+  const reabiertos = d.filter(x => x.estado === 'Reabierto').length;
+  const reabiertoRate = total ? reabiertos/total : 0;
+  const criticos = d.filter(x => x.prioridad === 'Critica').length;
+  const criticosSlaOk = d.filter(x => x.prioridad === 'Critica' && x.cumple_sla).length;
+  const criticosSlaRate = criticos ? criticosSlaOk/criticos : 0;
+  const iaResueltos = d.filter(x => x.resuelto_por === 'IA').length;
+  const iaRate = total ? iaResueltos/total : 0;
+  const enProgreso = d.filter(x => x.estado === 'En progreso').length;
+  const escalados = d.filter(x => x.estado === 'Escalado' || x.accion === 'Escalado a ingenieria').length;
+
+  const cards = [
+    {label: 'Total de tickets', value: fmtNum(total), sub: `${enProgreso} en progreso`, cls: 'c-accent'},
+    {label: 'Cumplimiento de SLA', value: fmtPct(slaRate), sub: `${total-slaOk} tickets incumplieron`, cls: slaRate >= 0.85 ? 'c-good' : 'c-danger', subCls: slaRate >= 0.85 ? 'good' : 'bad'},
+    {label: 'CSAT promedio', value: csatAvg.toFixed(2) + ' / 5', sub: `${csats.length} encuestas respondidas`, cls: csatAvg >= 4 ? 'c-good' : 'c-warn', subCls: ''},
+    {label: 'Tiempo prom. 1a respuesta', value: Math.round(frtAvg) + ' min', sub: 'promedio general', cls: 'c-accent'},
+    {label: 'Tasa de reapertura', value: fmtPct(reabiertoRate), sub: `${reabiertos} tickets reabiertos`, cls: reabiertoRate > 0.08 ? 'c-danger' : 'c-good', subCls: reabiertoRate > 0.08 ? 'bad' : 'good'},
+    {label: 'SLA en incidentes criticos', value: criticos ? fmtPct(criticosSlaRate) : 'N/A', sub: `${criticos} tickets criticos`, cls: criticosSlaRate < 1 && criticos ? 'c-danger' : 'c-good', subCls: criticosSlaRate < 1 && criticos ? 'bad' : 'good'},
+    {label: 'Resueltos por IA', value: fmtPct(iaRate), sub: `${iaResueltos} de ${total} tickets`, cls: 'c-accent'},
+    {label: 'Escalados a ingenieria', value: fmtNum(escalados), sub: fmtPct(total ? escalados/total : 0) + ' del total', cls: 'c-warn'},
+    {label: 'Deteccion de riesgo', value: fmtNum(d.filter(x=>x.estado==='Escalado').length), sub: 'tickets con estado "Escalado"', cls: 'c-warn'},
+    {label: 'Tickets sin resolver', value: fmtNum(enProgreso), sub: 'estado "En progreso"', cls: 'c-warn'},
+    {label: 'Clientes distintos', value: fmtNum(new Set(d.map(x=>x.cliente)).size), sub: 'en el periodo filtrado', cls: 'c-accent'},
+    {label: 'Volumen via IA/autom.', value: fmtNum(d.filter(x=>x.accion==='Respuesta automatica (IA)').length), sub: 'respuesta automatica', cls: 'c-accent'},
+  ];
+
+  document.getElementById('kpiGrid').innerHTML = cards.map(c => `
+    <div class="kpi ${c.cls}">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="sub ${c.subCls||''}">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ---------- Chart: volumen por dia ----------
+function renderVolumen() {
+  const byDay = {};
+  currentData.forEach(x => {
+    const day = x.fecha_hora.slice(0,10);
+    if (!byDay[day]) byDay[day] = {total: 0, breach: 0};
+    byDay[day].total++;
+    if (!x.cumple_sla) byDay[day].breach++;
+  });
+  const days = Object.keys(byDay).sort();
+  const totals = days.map(d => byDay[d].total);
+  const breaches = days.map(d => byDay[d].breach);
+
+  const ctx = document.getElementById('chartVolumen');
+  if (charts.volumen) charts.volumen.destroy();
+  charts.volumen = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: days.map(d => d.slice(5)),
+      datasets: [
+        {label: 'Tickets totales', data: totals, backgroundColor: 'rgba(79,209,197,0.55)', borderRadius: 3, order: 2},
+        {label: 'Incumplieron SLA', data: breaches, type: 'line', borderColor: COLORS.danger, backgroundColor: COLORS.danger, tension: 0.3, pointRadius: 2, order: 1}
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {mode: 'index', intersect: false},
+      plugins: {legend: {position: 'top', labels: {boxWidth: 10}}},
+      scales: {
+        x: {grid: {display:false}, ticks: {maxRotation: 0, autoSkip: true, maxTicksLimit: 15}},
+        y: {beginAtZero: true, grid: {color: 'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+// ---------- Chart: SLA por prioridad ----------
+function renderSlaPrioridad() {
+  const order = ['Critica','Alta','Media','Baja'];
+  const present = order.filter(p => currentData.some(x => x.prioridad === p));
+  const rates = present.map(p => {
+    const sub = currentData.filter(x => x.prioridad === p);
+    return sub.length ? sub.filter(x=>x.cumple_sla).length / sub.length : 0;
+  });
+  const colorFor = (r) => r >= 0.9 ? COLORS.good : r >= 0.75 ? COLORS.accent2 : COLORS.danger;
+
+  const ctx = document.getElementById('chartSlaPrioridad');
+  if (charts.sla) charts.sla.destroy();
+  charts.sla = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: present,
+      datasets: [{
+        label: '% Cumplimiento SLA',
+        data: rates.map(r => +(r*100).toFixed(1)),
+        backgroundColor: rates.map(colorFor),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {legend: {display: false}, tooltip: {callbacks: {label: (c) => c.parsed.x + '% cumplimiento'}}},
+      scales: {
+        x: {min: 0, max: 100, grid: {color: 'rgba(255,255,255,0.05)'}, ticks: {callback: v => v+'%'}},
+        y: {grid: {display: false}}
+      }
+    }
+  });
+}
+
+// ---------- Chart: por canal ----------
+function renderCanal() {
+  const counts = {};
+  currentData.forEach(x => counts[x.canal] = (counts[x.canal]||0)+1);
+  const labels = Object.keys(counts);
+  const values = labels.map(l => counts[l]);
+
+  const ctx = document.getElementById('chartCanal');
+  if (charts.canal) charts.canal.destroy();
+  charts.canal = new Chart(ctx, {
+    type: 'doughnut',
+    data: {labels, datasets: [{data: values, backgroundColor: PALETTE, borderColor: '#161d2e', borderWidth: 2}]},
+    options: {plugins: {legend: {position: 'bottom', labels: {boxWidth: 10, padding: 10}}}}
+  });
+}
+
+// ---------- Chart: por categoria ----------
+function renderCategoria() {
+  const counts = {};
+  currentData.forEach(x => counts[x.categoria] = (counts[x.categoria]||0)+1);
+  const labels = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
+  const values = labels.map(l => counts[l]);
+
+  const ctx = document.getElementById('chartCategoria');
+  if (charts.categoria) charts.categoria.destroy();
+  charts.categoria = new Chart(ctx, {
+    type: 'bar',
+    data: {labels, datasets: [{data: values, backgroundColor: COLORS.purple, borderRadius: 4}]},
+    options: {
+      plugins: {legend: {display: false}},
+      scales: {
+        x: {grid: {display: false}, ticks: {maxRotation: 30, minRotation: 30, font: {size: 10}}},
+        y: {beginAtZero: true, grid: {color: 'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+// ---------- Chart: resuelto por ----------
+function renderResuelto() {
+  const counts = {};
+  currentData.forEach(x => counts[x.resuelto_por] = (counts[x.resuelto_por]||0)+1);
+  const labels = Object.keys(counts);
+  const values = labels.map(l => counts[l]);
+  const colorMap = {IA: COLORS.accent, Humano: COLORS.blue, Mixto: COLORS.accent2};
+
+  const ctx = document.getElementById('chartResuelto');
+  if (charts.resuelto) charts.resuelto.destroy();
+  charts.resuelto = new Chart(ctx, {
+    type: 'pie',
+    data: {labels, datasets: [{data: values, backgroundColor: labels.map(l=>colorMap[l]||COLORS.dim), borderColor: '#161d2e', borderWidth: 2}]},
+    options: {plugins: {legend: {position: 'bottom', labels: {boxWidth: 10}}}}
+  });
+}
+
+// ---------- Chart: CSAT ----------
+function renderCsat() {
+  const canales = unique(currentData, 'canal');
+  const csatByCanal = canales.map(c => {
+    const vals = currentData.filter(x => x.canal===c && x.csat!==null).map(x=>x.csat);
+    return vals.length ? +avg(vals).toFixed(2) : 0;
+  });
+  const agentes = unique(currentData, 'resuelto_por');
+  const csatByAgente = agentes.map(a => {
+    const vals = currentData.filter(x => x.resuelto_por===a && x.csat!==null).map(x=>x.csat);
+    return vals.length ? +avg(vals).toFixed(2) : 0;
+  });
+
+  const ctx = document.getElementById('chartCsat');
+  if (charts.csat) charts.csat.destroy();
+  charts.csat = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [...canales, ...agentes],
+      datasets: [{
+        data: [...csatByCanal, ...csatByAgente],
+        backgroundColor: [...canales.map(()=>COLORS.accent), ...agentes.map(()=>COLORS.blue)],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      plugins: {legend: {display:false}, tooltip: {callbacks: {label: c => c.parsed.y + ' / 5'}}},
+      scales: {
+        x: {grid: {display:false}},
+        y: {min:0, max:5, grid: {color: 'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+// ---------- Chart: tiempos vs objetivo ----------
+function renderTiempos() {
+  const order = ['Critica','Alta','Media','Baja'];
+  const present = order.filter(p => currentData.some(x => x.prioridad === p));
+  const real = present.map(p => {
+    const sub = currentData.filter(x=>x.prioridad===p);
+    return Math.round(avg(sub.map(x=>x.tiempo_primera_respuesta_min)));
+  });
+  const objetivo = present.map(p => {
+    const sub = currentData.filter(x=>x.prioridad===p);
+    return sub.length ? sub[0].sla_objetivo_min : 0;
+  });
+
+  const ctx = document.getElementById('chartTiempos');
+  if (charts.tiempos) charts.tiempos.destroy();
+  charts.tiempos = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: present,
+      datasets: [
+        {label: 'Objetivo SLA (min)', data: objetivo, backgroundColor: 'rgba(152,162,187,0.35)', borderRadius: 4},
+        {label: 'Tiempo real promedio (min)', data: real, backgroundColor: COLORS.accent2, borderRadius: 4},
+      ]
+    },
+    options: {
+      plugins: {legend: {position: 'top', labels: {boxWidth: 10}}},
+      scales: {
+        x: {grid: {display:false}},
+        y: {beginAtZero: true, grid: {color: 'rgba(255,255,255,0.05)'}, title: {display:true, text:'minutos'}}
+      }
+    }
+  });
+}
+
+// ---------- Table: clientes ----------
+function renderTablaClientes() {
+  const byClient = {};
+  currentData.forEach(x => {
+    if (!byClient[x.cliente]) byClient[x.cliente] = {plan: x.plan, total: 0, breach: 0, reabierto: 0, csats: []};
+    const c = byClient[x.cliente];
+    c.total++;
+    if (!x.cumple_sla) c.breach++;
+    if (x.estado === 'Reabierto') c.reabierto++;
+    if (x.csat !== null) c.csats.push(x.csat);
+  });
+  const rows = Object.entries(byClient)
+    .map(([cliente, c]) => ({
+      cliente, plan: c.plan, total: c.total,
+      breachRate: c.total ? c.breach/c.total : 0,
+      reabierto: c.reabierto,
+      csatAvg: c.csats.length ? avg(c.csats) : null,
+    }))
+    .sort((a,b) => b.total - a.total)
+    .slice(0, 12);
+
+  const maxTotal = Math.max(...rows.map(r=>r.total), 1);
+  const tbody = document.querySelector('#tablaClientes tbody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td style="font-family:var(--font-display); font-weight:500;">${r.cliente}</td>
+      <td>${r.plan}</td>
+      <td>${r.total} <span class="bar-mini" style="width:${(r.total/maxTotal*50)}px; background:${COLORS.accent}"></span></td>
+      <td style="color:${r.breachRate > 0.25 ? 'var(--danger)' : r.breachRate > 0 ? 'var(--accent-2)' : 'var(--good)'}">${(r.breachRate*100).toFixed(0)}%</td>
+      <td style="color:${r.reabierto > 0 ? 'var(--danger)' : 'inherit'}">${r.reabierto}</td>
+      <td>${r.csatAvg !== null ? r.csatAvg.toFixed(1) : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+const CHART_CANVAS_IDS = ['chartVolumen','chartSlaPrioridad','chartCanal','chartCategoria','chartResuelto','chartCsat','chartTiempos'];
+
+function showChartsUnavailable() {
+  document.getElementById('offlineWarning').style.display = 'block';
+  CHART_CANVAS_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const msg = document.createElement('div');
+    msg.style.cssText = 'color:var(--text-dim); font-size:12.5px; padding:30px 10px; text-align:center;';
+    msg.textContent = 'Grafico no disponible sin conexion a internet.';
+    el.replaceWith(msg);
+  });
+}
+
+function renderAll() {
+  renderKPIs();
+  renderTablaClientes();
+  if (typeof Chart !== 'undefined') {
+    renderVolumen();
+    renderSlaPrioridad();
+    renderCanal();
+    renderCategoria();
+    renderResuelto();
+    renderCsat();
+    renderTiempos();
+  } else {
+    showChartsUnavailable();
+  }
+}
+
+// ---------- Init ----------
+function init() {
+  const dates = RAW_DATA.map(x => x.fecha_hora).sort();
+  document.getElementById('metaInfo').innerHTML =
+    `${dates[0].slice(0,10)} &rarr; ${dates[dates.length-1].slice(0,10)}<br>${RAW_DATA.length} tickets totales`;
+  populateFilters();
+  renderAll();
+}
+
+if (window.__chartLoadFailed) {
+  init();
+} else if (typeof Chart !== 'undefined') {
+  init();
+} else {
+  document.addEventListener('chartjs-ready', init, {once: true});
+  document.addEventListener('chartjs-unavailable', init, {once: true});
+}
+</script>
+</body>
+</html>

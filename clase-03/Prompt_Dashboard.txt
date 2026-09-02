@@ -1,0 +1,14 @@
+
+
+Creacion de Dashboards de KPIs con IA
+
+https://claude.ai/
+
+Prompt
+Soy un encargado de soporte al cliente en una compañía de servicios de software SaaS.
+Genera un dashboard con KPIs a partir de los datos del archivo adjunto. Identifica los KPIs más importantes para el negocio de soporte de un SaaS. Genéralo en un formato fácil de ejecutar (un solo archivo HTML, sin servidor ni instalación) que no utilice ninguna librería cargada desde CDN o internet, ya que mi red bloquea esas conexiones — todo el código (incluyendo el de los gráficos) debe estar contenido en el propio archivo. Además, en vez de tener los datos embebidos de forma fija, agrega un selector de archivo (botón "Cargar datos") para subir el CSV manualmente, de modo que el dashboard sea dinámico y pueda reutilizarse con otros archivos de datos con la misma estructura de columnas, finalmente, carga inicialmente los datos del archivo para tener una vision del resultado, permitiendo que el usuario pueda cargar un nuevo archivo.
+
+
+Archivo Adjunto
+
+clase-03\dataset_triage_soporte_saas.csv
